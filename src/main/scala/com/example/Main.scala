@@ -3,6 +3,7 @@ package com.example
 import caliban.Http4sAdapter
 import cats.data.Kleisli
 import com.comcast.ip4s._
+import com.example.application.constants.PrimaryError
 import com.example.application.core.AppContext
 import com.example.application.core.AuthorizationFilter
 import com.example.adapters.primary.graphql.GraphqlResolver
@@ -22,6 +23,12 @@ import org.http4s.HttpRoutes
 import org.http4s.Request
 import cats.data.OptionT
 import org.typelevel.ci.CIString
+import caliban.GraphQLInterpreter
+import caliban.CalibanError
+import caliban.CalibanError.ExecutionError
+import caliban.ResponseValue.ObjectValue
+import caliban.Value.StringValue
+import caliban.CalibanError.{ValidationError, ParsingError}
 
 object Main extends ZIOAppDefault {
 
@@ -52,6 +59,19 @@ object Main extends ZIOAppDefault {
       }
   }
 
+  def withErrorCodeExtensions[R <: AppContext.GqlEnv](
+    interpreter: GraphQLInterpreter[R, CalibanError]
+  ): GraphQLInterpreter[R, CalibanError] = interpreter.mapError {
+    case err @ ExecutionError(_, _, _, Some(primaryError: PrimaryError), _) =>
+      err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue(primaryError.code))))))
+    case err: ExecutionError =>
+      err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("EXECUTION_ERROR"))))))
+    case err: ValidationError =>
+      err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("VALIDATION_ERROR"))))))
+    case err: ParsingError =>
+      err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("PARSING_ERROR"))))))
+  }
+
   override def run =
     ZIO
       .runtime[AppContext.GqlEnv]
@@ -65,9 +85,23 @@ object Main extends ZIOAppDefault {
           .withPort(Port.fromInt(config.port).getOrElse(port"8088"))
           .withHttpWebSocketApp(wsBuilder =>
             Router[GqlAuthzTask](
-              "/api/graphql" -> GqlAuthzMiddleware(CORS.policy(Http4sAdapter.makeHttpService(interpreter))),
-              "/ws/graphql"  -> GqlAuthzMiddleware(CORS.policy(Http4sAdapter.makeWebSocketService(wsBuilder, interpreter))),
-              "/graphiql"    -> Kleisli.liftF(StaticFile.fromResource("/graphiql.html", None))
+              "/api/graphql" -> 
+                CORS.policy(
+                  GqlAuthzMiddleware(
+                    Http4sAdapter.makeHttpService(
+                      withErrorCodeExtensions[AppContext.GqlEnv](interpreter)
+                    )
+                  )
+                ),
+              "/ws/graphql" ->
+                CORS.policy(
+                  GqlAuthzMiddleware(
+                    Http4sAdapter.makeWebSocketService(wsBuilder,
+                      withErrorCodeExtensions[AppContext.GqlEnv](interpreter)
+                    )
+                  )
+                ),
+              "/graphiql" -> Kleisli.liftF(StaticFile.fromResource("/graphiql.html", None))
             ).orNotFound
           )
           .build

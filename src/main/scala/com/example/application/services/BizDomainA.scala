@@ -9,21 +9,21 @@ import com.example.ports.secondary.ItemRepository
 object BizDomainA {
 
   trait Service {
-    def getCharacters(origin: Option[Origin]): IO[BizDomainError, List[Character]]
-    def findCharacter(name: String): IO[BizDomainError, Option[Character]]
-    def deleteCharacter(name: String): IO[BizDomainError, Boolean]
+    def getCharacters(origin: Option[Origin]): IO[BizDomainAError, List[Character]]
+    def findCharacter(name: String): IO[BizDomainAError, Option[Character]]
+    def deleteCharacter(name: String): IO[BizDomainAError, Boolean]
     def deletedEvents: ZStream[Any, Nothing, String]
   }
 
   case class BizDomainImpl(itemRepo: ItemRepository) extends Service {
-    override def getCharacters(origin: Option[Origin]): IO[BizDomainError, List[Character]] = for {
-      items <- itemRepo.getAll().mapError(e => BizDomainError(e.cause))
+    override def getCharacters(origin: Option[Origin]): IO[BizDomainAError, List[Character]] = for {
+      items <- itemRepo.getAll().mapError(e => BizDomainAError())
       chars <- ZIO.succeed(items.map(v => Character(v.name, List.empty[String], Origin.EARTH, None)))
     } yield chars
 
-      override def findCharacter(name: String): IO[BizDomainError, Option[Character]] = ???
+      override def findCharacter(name: String): IO[BizDomainAError, Option[Character]] = ???
 
-      override def deleteCharacter(name: String): IO[BizDomainError, Boolean] = ???
+      override def deleteCharacter(name: String): IO[BizDomainAError, Boolean] = ???
 
       override def deletedEvents: ZStream[Any, Nothing, String] = ???
   }

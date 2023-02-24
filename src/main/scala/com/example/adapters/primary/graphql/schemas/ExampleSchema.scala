@@ -18,11 +18,11 @@ object ExampleSchema {
 
   case class Queries(
     @GQLDescription("Return all characters from a given origin")
-    characters: CharactersArgs => ZIO[ExampleApi, ResolverError, List[Character]],
+    characters: CharactersArgs => ZIO[ExampleApi, PrimaryError, List[Character]],
     @GQLDeprecated("Use `characters`")
-    character: CharacterArgs => ZIO[ExampleApi, ResolverError, Option[Character]]
+    character: CharacterArgs => ZIO[ExampleApi, PrimaryError, Option[Character]]
   )
-  case class Mutations(deleteCharacter: CharacterArgs => ZIO[ExampleApi, ResolverError, Boolean])
+  case class Mutations(deleteCharacter: CharacterArgs => ZIO[ExampleApi, PrimaryError, Boolean])
   case class Subscriptions(characterDeleted: ZStream[ExampleApi, Nothing, String])
 
   implicit val roleSchema: Schema[Any, Role]                     = Schema.gen
