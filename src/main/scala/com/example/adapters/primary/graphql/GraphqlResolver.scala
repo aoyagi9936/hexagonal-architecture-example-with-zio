@@ -4,18 +4,18 @@ import caliban.GraphQL
 import caliban.wrappers.ApolloTracing.apolloTracing
 import caliban.wrappers.Wrappers._
 
-import com.example.ports.primary.ExampleServiceApi
-import com.example.adapters.primary.graphql.apis.ExampleApi
+import com.example.ports.primary.ExampleApi
+import com.example.adapters.primary.graphql.schemas.ExampleSchema
 
 import zio._
 
 import scala.language.postfixOps
 
-object GraphqlApi {
+object GraphqlResolver {
 
-  type Env = ExampleServiceApi
+  type Env = ExampleApi
 
-  val api: GraphQL[Env] = ExampleApi.api // |+| OtherApi.api
+  val api: GraphQL[Env] = ExampleSchema.api // |+| OtherApi.api
    @@
       maxFields(200) @@               // query analyzer that limit query fields
       maxDepth(30) @@                 // query analyzer that limit query depth

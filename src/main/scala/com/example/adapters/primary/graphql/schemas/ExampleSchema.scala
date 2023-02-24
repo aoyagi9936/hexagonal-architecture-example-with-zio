@@ -1,8 +1,8 @@
-package com.example.adapters.primary.graphql.apis
+package com.example.adapters.primary.graphql.schemas
 
 import com.example.application.constants._
 import com.example.application.models.ExampleData._
-import com.example.ports.primary.ExampleServiceApi
+import com.example.ports.primary.ExampleApi
 
 import caliban.GraphQL.graphQL
 import caliban.RootResolver
@@ -14,16 +14,16 @@ import zio.stream.ZStream
 
 import scala.language.postfixOps
 
-object ExampleApi {
+object ExampleSchema {
 
   case class Queries(
     @GQLDescription("Return all characters from a given origin")
-    characters: CharactersArgs => URIO[ExampleServiceApi, List[Character]],
+    characters: CharactersArgs => ZIO[ExampleApi, ResolverError, List[Character]],
     @GQLDeprecated("Use `characters`")
-    character: CharacterArgs => URIO[ExampleServiceApi, Option[Character]]
+    character: CharacterArgs => ZIO[ExampleApi, ResolverError, Option[Character]]
   )
-  case class Mutations(deleteCharacter: CharacterArgs => URIO[ExampleServiceApi, Boolean])
-  case class Subscriptions(characterDeleted: ZStream[ExampleServiceApi, Nothing, String])
+  case class Mutations(deleteCharacter: CharacterArgs => ZIO[ExampleApi, ResolverError, Boolean])
+  case class Subscriptions(characterDeleted: ZStream[ExampleApi, Nothing, String])
 
   implicit val roleSchema: Schema[Any, Role]                     = Schema.gen
   implicit val characterSchema: Schema[Any, Character]           = Schema.gen
@@ -31,14 +31,14 @@ object ExampleApi {
   implicit val charactersArgsSchema: Schema[Any, CharactersArgs] = Schema.gen
 
   val api =
-    graphQL[ExampleServiceApi, Queries, Unit, Unit](
+    graphQL[ExampleApi, Queries, Unit, Unit](
       RootResolver(
         Queries(
-          args => ExampleServiceApi.getCharacters(args.origin),
-          args => ExampleServiceApi.findCharacter(args.name)
+          args => ExampleApi.getCharacters(args.origin),
+          args => ExampleApi.findCharacter(args.name)
         ),
-        Mutations(args => ExampleServiceApi.deleteCharacter(args.name)),
-        Subscriptions(ExampleServiceApi.deletedEvents)
+        Mutations(args => ExampleApi.deleteCharacter(args.name)),
+        Subscriptions(ExampleApi.deletedEvents)
       )
     )
 

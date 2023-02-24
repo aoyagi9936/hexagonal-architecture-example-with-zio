@@ -4,15 +4,15 @@ import com.example.ports.secondary.ItemRepository
 import com.example.application.constants._
 import com.example.application.models.{ItemId, Item, ItemData}
 
-import zio.{ ZIO, UIO, ZLayer, ULayer }
+import zio.{ ZIO, IO, ZLayer, ULayer }
 
 final class ItemRepositoryMock extends ItemRepository {
 
-  override def add(data: ItemData): UIO[ItemId] = ???
+  override def add(data: ItemData): IO[RepositoryError, ItemId] = ???
 
-  override def delete(id: ItemId): UIO[Long] = ???
+  override def delete(id: ItemId): IO[RepositoryError, Long] = ???
 
-  override def getAll(): UIO[List[Item]] = ZIO.succeed(
+  override def getAll(): IO[RepositoryError, List[Item]] = ZIO.succeed(
     List(
       Item(ItemId(100000), "test1", 1000),
       Item(ItemId(200000), "test2", 2000),
@@ -22,9 +22,9 @@ final class ItemRepositoryMock extends ItemRepository {
     )
   )
 
-  override def getById(id: ItemId): UIO[Option[Item]] = ???
+  override def getById(id: ItemId): IO[RepositoryError, Option[Item]] = ???
 
-  override def update(itemId: ItemId, data: ItemData): UIO[Option[Unit]] = ???
+  override def update(itemId: ItemId, data: ItemData): IO[RepositoryError, Option[Unit]] = ???
 
   val layer: ULayer[ItemRepository] = ZLayer.succeed(
     ItemRepositoryMock()
