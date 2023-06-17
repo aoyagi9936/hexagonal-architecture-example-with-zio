@@ -1,12 +1,11 @@
-val calibanVersion        = "2.0.2"
-val zioVersion            = "2.0.2"
-val zioConfigVersion      = "3.0.2"
-val zioLoggingVersion     = "2.1.2"
+val calibanVersion        = "2.2.1"
+val tapirJsonZioVersion   = "1.2.13"
+val zioVersion            = "2.0.15"
+val zioConfigVersion      = "3.0.7"
+val zioLoggingVersion     = "2.1.13"
 val logbackClassicVersion = "1.4.4"
 val postgresqlVersion     = "42.5.0"
-val testContainersVersion = "0.40.11"
-val zioMockVersion        = "1.0.0-RC8"
-val quillVersion          = "4.6.0"
+val quillVersion          = "4.6.0.1"
 
 lazy val root = (project in file("."))
   .settings(
@@ -18,12 +17,14 @@ lazy val root = (project in file("."))
         run / connectInput := true,
       )
     ),
-    name           := "caliban-example",
+    name           := "zio-hexagon-example",
     libraryDependencies ++= Seq(
-      "com.github.ghostdogpr" %% "caliban-http4s" % calibanVersion,
-      "org.http4s"            %% "http4s-ember-server" % "0.23.16",
-      "io.getquill"   %% "quill-jdbc-zio"      % quillVersion excludeAll (
-        ExclusionRule(organization = "org.scala-lang.modules")
+      "com.github.ghostdogpr"       %% "caliban-http4s"      % calibanVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-zio"      % tapirJsonZioVersion,
+      "org.http4s"                  %% "http4s-ember-server" % "0.23.16",
+      "io.getquill"                 %% "quill-jdbc-zio"      % quillVersion excludeAll (
+        ExclusionRule(organization = "org.scala-lang.modules"),
+        ExclusionRule(organization = "org.scalameta"),
       ),
       "org.postgresql" % "postgresql"          % postgresqlVersion,
       "dev.zio"       %% "zio-config"          % zioConfigVersion,
@@ -35,12 +36,8 @@ lazy val root = (project in file("."))
       "ch.qos.logback" % "logback-classic"   % logbackClassicVersion,
 
       // test
-      "dev.zio"      %% "zio-test"                        % zioVersion            % Test,
-      "dev.zio"      %% "zio-test-sbt"                    % zioVersion            % Test,
-      "dev.zio"      %% "zio-test-junit"                  % zioVersion            % Test,
-      "dev.zio"      %% "zio-mock"                        % zioMockVersion        % Test,
-      "com.dimafeng" %% "testcontainers-scala-postgresql" % testContainersVersion % Test,
-      "dev.zio"      %% "zio-test-magnolia"               % zioVersion            % Test,
+      "dev.zio"       %% "zio-test"          % zioVersion % Test,
+      "dev.zio"       %% "zio-test-sbt"      % zioVersion % Test,
     ),
     testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
   )

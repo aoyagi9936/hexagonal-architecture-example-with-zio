@@ -1,20 +1,18 @@
 package com.example
 
-import caliban.Http4sAdapter
 import cats.data.Kleisli
 import com.comcast.ip4s._
 import com.example.application.constants.PrimaryError
-import com.example.application.core.AppContext
-import com.example.application.core.AuthorizationFilter
+import com.example.application.core.{ AppContext, AuthorizationFilter }
 import com.example.adapters.primary.graphql.GraphqlResolver
 import org.http4s.StaticFile
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.middleware.CORS
+
 import zio._
 import zio.interop.catz._
-
 import zio.config._
 import com.example.application.config.Configuration._
 import zio.logging.backend.SLF4J
@@ -23,18 +21,19 @@ import org.http4s.HttpRoutes
 import org.http4s.Request
 import cats.data.OptionT
 import org.typelevel.ci.CIString
-import caliban.GraphQLInterpreter
-import caliban.CalibanError
+
+import caliban.{ Http4sAdapter, GraphQLInterpreter, CalibanError }
+import caliban.interop.tapir.{ HttpInterpreter, WebSocketInterpreter }
 import caliban.CalibanError.ExecutionError
 import caliban.ResponseValue.ObjectValue
 import caliban.Value.StringValue
-import caliban.CalibanError.{ValidationError, ParsingError}
+import caliban.CalibanError.{ ValidationError, ParsingError }
 
 object Main extends ZIOAppDefault {
 
   override val bootstrap: ULayer[Unit] = Runtime.removeDefaultLoggers >>> SLF4J.slf4j
 
-  import sttp.tapir.json.circe._
+  import sttp.tapir.json.zio._
 
   type GqlAuthzTask[A] = RIO[AppContext.GqlEnv, A]
 
@@ -89,7 +88,9 @@ object Main extends ZIOAppDefault {
                 CORS.policy(
                   GqlAuthzMiddleware(
                     Http4sAdapter.makeHttpService(
-                      withErrorCodeExtensions[AppContext.GqlEnv](interpreter)
+                      HttpInterpreter(
+                        withErrorCodeExtensions[AppContext.GqlEnv](interpreter)
+                      )
                     )
                   )
                 ),
@@ -97,7 +98,9 @@ object Main extends ZIOAppDefault {
                 CORS.policy(
                   GqlAuthzMiddleware(
                     Http4sAdapter.makeWebSocketService(wsBuilder,
-                      withErrorCodeExtensions[AppContext.GqlEnv](interpreter)
+                      WebSocketInterpreter(
+                        withErrorCodeExtensions[AppContext.GqlEnv](interpreter)
+                      )
                     )
                   )
                 ),
