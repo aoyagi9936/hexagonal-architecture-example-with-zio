@@ -5,8 +5,9 @@ import com.example.application.models.ExampleData.Role.{ Captain, Engineer, Mech
 
 object ExampleData {
 
-  sealed trait Origin
+  case class Character(name: String, nicknames: List[String], origin: Origin, role: Option[Role])
 
+  sealed trait Origin
   object Origin {
     case object EARTH extends Origin
     case object MARS  extends Origin
@@ -14,18 +15,12 @@ object ExampleData {
   }
 
   sealed trait Role
-
   object Role {
     case class Captain(shipName: String)  extends Role
     case class Pilot(shipName: String)    extends Role
     case class Engineer(shipName: String) extends Role
     case class Mechanic(shipName: String) extends Role
   }
-
-  case class Character(name: String, nicknames: List[String], origin: Origin, role: Option[Role])
-
-  case class CharactersArgs(origin: Option[Origin])
-  case class CharacterArgs(name: String)
 
   val sampleCharacters = List(
     Character("James Holden", List("Jim", "Hoss"), EARTH, Some(Captain("Rocinante"))),

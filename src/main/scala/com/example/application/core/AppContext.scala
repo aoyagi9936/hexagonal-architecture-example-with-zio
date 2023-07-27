@@ -1,25 +1,47 @@
 package com.example.application.core
 
 import com.example.adapters.primary.graphql.GraphqlResolver
+import com.example.adapters.primary.rest.RestResolver
 import com.example.application.models.ExampleData._
 import com.example.application.services.BizDomainA
-import com.example.application.config.Configuration.ServerConfig
+import com.example.application.config.Configuration._
 import com.example.adapters.primary.graphql.apis._
+import com.example.adapters.primary.rest.apis._
 import com.example.adapters.secondary.postgres.ItemRepositoryMock
 
-import zio.{Scope, ZLayer}
+import zio._
 
 object AppContext {
 
-  type GqlEnv = GraphqlResolver.Env with ServerConfig with AuthorizationFilter.Service
+  type GqlApp  = GraphqlResolver.Apis with ServerConfig with AuthorizationFilter.Service
+  type RestApp = RestResolver.Apis with ServerConfig with AuthorizationFilter.Service
 
-  def gqlLayer: ZLayer[Any, Throwable, GqlEnv] = ZLayer.make[GqlEnv](
+  private val graphqlServerConfig = ZLayer.fromZIO(ZIO.config[ServerConfig](GraphQLServerConfig.config))
+  private val restServerConfig = ZLayer.fromZIO(ZIO.config[ServerConfig](RestServerConfig.config))
+
+  def gqlLayer: ZLayer[Any, Throwable, GqlApp] = ZLayer.make[GqlApp](
     // Core
     AuthorizationFilter.layer,
-    ServerConfig.layer,
+    graphqlServerConfig,
 
     // Primary
     ExampleApiLive.layer,
+
+    // Domain
+    BizDomainA.layer,
+
+    // Secondary
+    new ItemRepositoryMock().layer
+
+  )
+
+  def restLayer: ZLayer[Any, Throwable, RestApp] = ZLayer.make[RestApp](
+    // Core
+    AuthorizationFilter.layer,
+    restServerConfig,
+
+    // Primary
+    ExampleReadApiLive.layer,
 
     // Domain
     BizDomainA.layer,

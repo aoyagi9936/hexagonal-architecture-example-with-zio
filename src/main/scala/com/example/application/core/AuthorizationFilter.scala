@@ -25,7 +25,7 @@ object AuthorizationFilter {
               token <- this.getToken
               r     <- token match {
                 case Some(_) => ZIO.succeed(true)
-                case None => ZIO.fail(UnAuthorizedError)
+                case None    => ZIO.fail(UnAuthorizedError)
               }
             } yield r
           }

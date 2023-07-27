@@ -10,6 +10,7 @@ case object UnAuthorizedError extends PrimaryError("UNAUTHORIZED_ERROR", "You ar
 case object ForbiddenError extends PrimaryError("FORBIDDEN_ERROR", "Permission denied for this resource. Add the roles you need to access the resource.")
 //500 Internal Server Error
 case object InternalServerError extends PrimaryError("INTERNAL_SERVER_ERROR", "An Internal Server Error has occurred. Please contact support.")
+case class RestInternalServerError(errorCode: String, message: String) extends PrimaryError("INTERNAL_SERVER_ERROR", "An Internal Server Error has occurred. Please contact support.")
 
 // Domain Layer
 sealed trait DomainError(message: String)

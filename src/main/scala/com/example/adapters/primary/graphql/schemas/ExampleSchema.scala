@@ -20,29 +20,33 @@ object ExampleSchema {
 
   case class Queries(
     @GQLDescription("Return all characters from a given origin")
-    characters: CharactersArgs => ZIO[ExampleApi, PrimaryError, List[Character]],
+    characters: CharactersArgs => ZIO[Apis, PrimaryError, List[Character]],
     @GQLDeprecated("Use `characters`")
-    character: CharacterArgs => ZIO[ExampleApi, PrimaryError, Option[Character]]
+    character: CharacterArgs   => ZIO[Apis, PrimaryError, Option[Character]]
   )
-  case class Mutations(deleteCharacter: CharacterArgs => ZIO[ExampleApi, PrimaryError, Boolean])
-  case class Subscriptions(characterDeleted: ZStream[ExampleApi, Nothing, String])
+  case class Mutations(deleteCharacter: CharacterArgs => ZIO[Apis, PrimaryError, Boolean])
+  case class Subscriptions(characterDeleted: ZStream[Apis, Nothing, String])
+
+  // Enum/Union
+  given Schema[Any, Origin]         = Schema.Auto.derived
+  given Schema[Any, Role]           = Schema.Auto.derived
 
   // Request
   given Schema[Any, CharacterArgs]  = Schema.gen
   given ArgBuilder[CharacterArgs]   = ArgBuilder.gen
   given Schema[Any, CharactersArgs] = Schema.gen
-  given Schema[Any, Origin]         = Schema.Auto.derived
   given ArgBuilder[CharactersArgs]  = ArgBuilder.Auto.derived
 
   // Response
   given Schema[Any, Character]      = Schema.gen
-  given Schema[Any, Role]           = Schema.Auto.derived
 
-  // Query Schema
+  // Schema
   given Schema[Apis, Queries]       = Schema.gen
+  given Schema[Apis, Mutations]     = Schema.gen
+  given Schema[Apis, Subscriptions] = Schema.gen
 
   val api =
-    graphQL[Apis, Queries, Unit, Unit](
+    graphQL(
       RootResolver(
         Queries(
           args => ExampleApi.getCharacters(args.origin),

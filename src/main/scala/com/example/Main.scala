@@ -5,6 +5,8 @@ import com.comcast.ip4s._
 import com.example.application.constants.PrimaryError
 import com.example.application.core.{ AppContext, AuthorizationFilter }
 import com.example.adapters.primary.graphql.GraphqlResolver
+import com.example.adapters.primary.rest.RestResolver
+import com.example.application.config.Configuration._
 import org.http4s.StaticFile
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
@@ -13,14 +15,14 @@ import org.http4s.server.middleware.CORS
 
 import zio._
 import zio.interop.catz._
-import zio.config._
-import com.example.application.config.Configuration._
 import zio.logging.backend.SLF4J
+import zio.config.typesafe.TypesafeConfigProvider
 
 import org.http4s.HttpRoutes
 import org.http4s.Request
 import cats.data.OptionT
 import org.typelevel.ci.CIString
+import org.http4s.implicits._
 
 import caliban.{ Http4sAdapter, GraphQLInterpreter, CalibanError }
 import caliban.interop.tapir.{ HttpInterpreter, WebSocketInterpreter }
@@ -31,18 +33,22 @@ import caliban.CalibanError.{ ValidationError, ParsingError }
 
 object Main extends ZIOAppDefault {
 
-  override val bootstrap: ULayer[Unit] = Runtime.removeDefaultLoggers >>> SLF4J.slf4j
+  override val bootstrap: ULayer[Unit] =
+    Runtime.setConfigProvider(
+      TypesafeConfigProvider
+        .fromResourcePath()
+    ) >>> Runtime.removeDefaultLoggers >>> SLF4J.slf4j
 
   import sttp.tapir.json.zio._
 
-  type GqlAuthzTask[A] = RIO[AppContext.GqlEnv, A]
+  type GqlAuthzTask[A] = RIO[AppContext.GqlApp, A]
 
-  object GqlAuthzMiddleware {
+  object AuthzMiddleware {
     def apply(route: HttpRoutes[GqlAuthzTask]): HttpRoutes[GqlAuthzTask] =
       Kleisli { (req: Request[GqlAuthzTask]) =>
         for {
           _ <- OptionT.liftF {
-            val authzTask:GqlAuthzTask[Unit] = (for {
+            val authzTask: GqlAuthzTask[Unit] = (for {
               _ <- req.headers.get(CIString("Authorization")) match {
                 case Some(value) =>
                   ZIO.environmentWithZIO[AuthorizationFilter.Service](_.get.setToken(
@@ -58,7 +64,7 @@ object Main extends ZIOAppDefault {
       }
   }
 
-  def withErrorCodeExtensions[R <: AppContext.GqlEnv](
+  def withErrorCodeExtensions[R <: AppContext.GqlApp](
     interpreter: GraphQLInterpreter[R, CalibanError]
   ): GraphQLInterpreter[R, CalibanError] = interpreter.mapError {
     case err @ ExecutionError(_, _, _, Some(primaryError: PrimaryError), _) =>
@@ -71,12 +77,12 @@ object Main extends ZIOAppDefault {
       err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("PARSING_ERROR"))))))
   }
 
-  override def run =
+  val graphql = (args: Chunk[String]) =>
     ZIO
-      .runtime[AppContext.GqlEnv]
+      .runtime[AppContext.GqlApp]
       .flatMap(implicit runtime =>
         for {
-          config      <- getConfig[ServerConfig]
+          config      <- ZIO.service[ServerConfig]
           interpreter <- GraphqlResolver.api.interpreter
           _           <- EmberServerBuilder
           .default[GqlAuthzTask]
@@ -86,20 +92,20 @@ object Main extends ZIOAppDefault {
             Router[GqlAuthzTask](
               "/api/graphql" -> 
                 CORS.policy(
-                  GqlAuthzMiddleware(
+                  AuthzMiddleware(
                     Http4sAdapter.makeHttpService(
                       HttpInterpreter(
-                        withErrorCodeExtensions[AppContext.GqlEnv](interpreter)
+                        withErrorCodeExtensions[AppContext.GqlApp](interpreter)
                       )
                     )
                   )
                 ),
               "/ws/graphql" ->
                 CORS.policy(
-                  GqlAuthzMiddleware(
+                  AuthzMiddleware(
                     Http4sAdapter.makeWebSocketService(wsBuilder,
                       WebSocketInterpreter(
-                        withErrorCodeExtensions[AppContext.GqlEnv](interpreter)
+                        withErrorCodeExtensions[AppContext.GqlApp](interpreter)
                       )
                     )
                   )
@@ -112,5 +118,30 @@ object Main extends ZIOAppDefault {
         } yield ()
       )
       .provideSomeLayer[Scope](AppContext.gqlLayer)
-}
 
+  val rest = (args: Chunk[String]) =>
+    ZIO
+      .runtime[AppContext.RestApp]
+      .flatMap(implicit runtime =>
+        for {
+          config      <- ZIO.service[ServerConfig]
+          _           <- EmberServerBuilder
+          .default[RIO[RestResolver.Apis, *]]
+          .withHost(Host.fromString(config.host).getOrElse(host"localhost"))
+          .withPort(Port.fromInt(config.port).getOrElse(port"9000"))
+          .withHttpApp(
+            Router("/" -> RestResolver.routes).orNotFound
+          )
+          .build
+          .toScopedZIO *> ZIO.never
+        } yield ()
+      )
+      .provideSomeLayer[Scope](AppContext.restLayer)
+
+  override def run =
+    (for {
+      args <- getArgs
+      _    <- graphql(args) zipPar rest(args)
+    } yield()).exitCode
+
+}
