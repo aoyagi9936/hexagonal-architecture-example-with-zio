@@ -10,20 +10,23 @@ import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import com.example.application.constants._
-import com.example.application.models.ExampleData._
+import com.example.application.models.CharactersData._
 
 object TapirSupport extends Tapir
     with ZTapir
     with TapirJsonZio {
 
-  given JsonCodec[Origin] = DeriveJsonCodec.gen[Origin]
-  given JsonCodec[Role] = DeriveJsonCodec.gen[Role]
-  given JsonCodec[Character] = DeriveJsonCodec.gen[Character]
+  given JsonCodec[Origin]        = DeriveJsonCodec.gen[Origin]
+  given JsonCodec[Role]          = DeriveJsonCodec.gen[Role]
+  given JsonDecoder[CharacterId] = JsonDecoder[String].map(CharacterId(_))
+  given JsonEncoder[CharacterId] = JsonEncoder[String].contramap(_.value)
+  given JsonCodec[Character]     = DeriveJsonCodec.gen[Character]
   given JsonCodec[RestInternalServerError] = DeriveJsonCodec.gen[RestInternalServerError]
 
-  given Schema[Origin] = Schema.derived[Origin]
-  given Schema[Role] = Schema.derived[Role]
-  given Schema[Character] = Schema.derived[Character]
+  given Schema[Origin]      = Schema.derived[Origin]
+  given Schema[Role]        = Schema.derived[Role]
+  given Schema[CharacterId] = Schema.string
+  given Schema[Character]   = Schema.derived[Character]
   given Schema[RestInternalServerError] = Schema.derived[RestInternalServerError]
 
   val originMaybeQuery: EndpointInput.Query[Option[Origin]] =

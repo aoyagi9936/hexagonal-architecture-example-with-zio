@@ -1,8 +1,8 @@
 package com.example.adapters.primary.graphql.schemas
 
 import com.example.application.constants._
-import com.example.application.models.ExampleData._
-import com.example.ports.primary.ExampleApi
+import com.example.application.models.CharactersData._
+import com.example.ports.primary.CharactersApi
 
 import caliban.graphQL
 import caliban.RootResolver
@@ -16,7 +16,7 @@ import scala.language.postfixOps
 
 object ExampleSchema {
 
-  type Apis = ExampleApi
+  type Apis = CharactersApi
 
   case class Queries(
     @GQLDescription("Return all characters from a given origin")
@@ -38,6 +38,7 @@ object ExampleSchema {
   given ArgBuilder[CharactersArgs]  = ArgBuilder.Auto.derived
 
   // Response
+  given Schema[Any, CharacterId]    = Schema.stringSchema.contramap(_.value)
   given Schema[Any, Character]      = Schema.gen
 
   // Schema
@@ -49,11 +50,11 @@ object ExampleSchema {
     graphQL(
       RootResolver(
         Queries(
-          args => ExampleApi.getCharacters(args.origin),
-          args => ExampleApi.findCharacter(args.name)
+          args => CharactersApi.getCharacters(args.origin),
+          args => CharactersApi.findCharacter(args.name)
         ),
-        Mutations(args => ExampleApi.deleteCharacter(args.name)),
-        Subscriptions(ExampleApi.deletedEvents)
+        Mutations(args => CharactersApi.deleteCharacter(args.name)),
+        Subscriptions(CharactersApi.deletedEvents)
       )
     )
 

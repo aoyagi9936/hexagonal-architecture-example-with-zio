@@ -6,16 +6,16 @@ import sttp.tapir.PublicEndpoint
 import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
 import sttp.model.StatusCode
 
-import com.example.ports.primary.ExampleReadApi
-import com.example.application.models.ExampleData._
+import com.example.ports.primary.CharactersPublicApi
+import com.example.application.models.CharactersData._
 import com.example.application.constants._
 import TapirSupport.{given, _}
 
 import zio._
 
-object ExampleReadEndpoint {
+object CharactersPublicEndpoint {
 
-  type Apis = ExampleReadApi
+  type Apis = CharactersPublicApi
 
   val baseEndpoint: PublicEndpoint[Unit, PrimaryError, Unit, Any] =
     endpoint
@@ -36,7 +36,7 @@ object ExampleReadEndpoint {
       .out(jsonBody[List[Character]])
 
   val charactersLogic = charactersEndpoint.zServerLogic {
-    origin => ExampleReadApi.getCharacters(origin)
+    origin => CharactersPublicApi.getCharacters(origin)
   }
 
 }

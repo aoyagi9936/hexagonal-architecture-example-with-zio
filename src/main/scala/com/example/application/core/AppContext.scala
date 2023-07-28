@@ -2,12 +2,12 @@ package com.example.application.core
 
 import com.example.adapters.primary.graphql.GraphqlResolver
 import com.example.adapters.primary.rest.RestResolver
-import com.example.application.models.ExampleData._
-import com.example.application.services.BizDomainA
+import com.example.application.models.CharactersData._
+import com.example.application.services._
 import com.example.application.config.Configuration._
 import com.example.adapters.primary.graphql.apis._
 import com.example.adapters.primary.rest.apis._
-import com.example.adapters.secondary.postgres.ItemRepositoryMock
+import com.example.adapters.secondary.postgres._
 
 import zio._
 
@@ -25,13 +25,13 @@ object AppContext {
     graphqlServerConfig,
 
     // Primary
-    ExampleApiLive.layer,
+    CharactersApiLive.layer,
 
     // Domain
-    BizDomainA.layer,
+    CharactersService.layer,
 
     // Secondary
-    new ItemRepositoryMock().layer
+    new CharactersRepositoryMock().layer
 
   )
 
@@ -41,13 +41,13 @@ object AppContext {
     restServerConfig,
 
     // Primary
-    ExampleReadApiLive.layer,
+    CharactersPublicApiLive.layer,
 
     // Domain
-    BizDomainA.layer,
+    CharactersService.layer,
 
     // Secondary
-    new ItemRepositoryMock().layer
+    new CharactersRepositoryMock().layer
 
   )
 

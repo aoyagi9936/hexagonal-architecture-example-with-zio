@@ -14,7 +14,7 @@ case class RestInternalServerError(errorCode: String, message: String) extends P
 
 // Domain Layer
 sealed trait DomainError(message: String)
-final case class BizDomainAError(cause: Throwable = new Throwable) extends DomainError(message = cause.getMessage)
+final case class CharactersServiceError(cause: Throwable = new Throwable) extends DomainError(message = cause.getMessage)
 
 // Secondary Layer
 sealed trait SecondaryError(message: String)

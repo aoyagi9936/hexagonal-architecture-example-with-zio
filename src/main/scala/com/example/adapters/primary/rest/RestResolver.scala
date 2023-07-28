@@ -9,19 +9,18 @@ import zio.interop.catz._
 import cats.syntax.all._
 
 import com.example.adapters.primary.rest.endpoints._
-import com.example.ports.primary.ExampleReadApi
 import TapirSupport._
 
 object RestResolver {
 
-  type Apis = ExampleReadEndpoint.Apis
+  type Apis = CharactersPublicEndpoint.Apis
 
   val swaggerRoutes: HttpRoutes[RIO[Apis, *]] =
     ZHttp4sServerInterpreter()
       .from(
         SwaggerInterpreter().fromEndpoints[RIO[Apis, *]](
           List(
-            ExampleReadEndpoint.charactersEndpoint
+            CharactersPublicEndpoint.charactersEndpoint
           ), "Example Rest API", "1.0")
       )
       .toRoutes
@@ -29,7 +28,7 @@ object RestResolver {
   val routes = ZHttp4sServerInterpreter()
     .from(
       List(
-        ExampleReadEndpoint.charactersLogic.widen[Apis]
+        CharactersPublicEndpoint.charactersLogic.widen[Apis]
       )
     )
     .toRoutes <+> swaggerRoutes
