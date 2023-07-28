@@ -3,6 +3,8 @@
 This is a sample repository of hexagonal architecture practiced with [ZIO](https://zio.dev/).  
 Note that it is intended to efficiently standardize the API implementation of the GraphQL and Rest servers using the Caliban and Tapir libraries, and does not strictly practice the DDD pattern.  
 
+![Hexagonal Architecture Image](https://github.com/aoyagi9936/scala-zio-hexagonal-architecture/blob/main/hexagonal_architecture.png)
+
 ## Folder Structure Summary
 
 Start each server in `Main.scala` and inject dependencies in `AppContext.scala` .  
