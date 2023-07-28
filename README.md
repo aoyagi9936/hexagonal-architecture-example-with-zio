@@ -1,7 +1,7 @@
 ## What is this repository?
 
-This is a sample repository of hexagonal architecture practiced with [ZIO](https://zio.dev/).  
-Note that this is not a strict practice of the DDD pattern, as it is intended to commonize the GraphQL and Rest server API implementations while separating of concerns using the Caliban and Tapir libraries.  
+This is a example repository of hexagonal architecture practiced with [ZIO](https://zio.dev/).  
+Note that this is not a strict practice of the DDD pattern, as it is intended to commonize the GraphQL and Rest server application logic while separating of concerns (SoC) using the Caliban, Tapir and ZIO libraries.  
 
 ![Hexagonal Architecture Image](https://github.com/aoyagi9936/hexagonal-architecture-example-with-zio/blob/main/hexagonal_architecture.png)
 
