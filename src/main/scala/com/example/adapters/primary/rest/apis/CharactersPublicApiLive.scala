@@ -19,9 +19,11 @@ object CharactersPublicApiLive {
       svc   <- ZIO.service[CharactersService]
     } yield new CharactersPublicApi {
       def getCharacters(origin: Option[Origin]): IO[PrimaryError, List[Character]] =
-        svc.getCharacters(origin).mapError(_ => InternalServerError)
+        svc.getCharacters(origin)
+          .mapError(_ => InternalServerError)
       def findCharacter(name: String): IO[PrimaryError, Option[Character]] =
-        svc.findCharacter(name).mapError(_ => InternalServerError)
+        svc.findCharacter(name)
+          .mapError(_ => InternalServerError)
     }
   }
 

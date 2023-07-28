@@ -2,7 +2,6 @@ package com.example.ports.primary
 
 import com.example.application.constants.PrimaryError
 import com.example.application.models.CharactersData._
-import zio.stream.ZStream
 import zio.{ IO, ZIO }
 
 trait CharactersPublicApi:

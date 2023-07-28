@@ -19,11 +19,14 @@ object CharactersApiLive {
       svc   <- ZIO.service[CharactersService]
     } yield new CharactersApi {
       def getCharacters(origin: Option[Origin]): IO[PrimaryError, List[Character]] =
-        svc.getCharacters(origin).mapError(_ => InternalServerError)
+        svc.getCharacters(origin)
+          .mapError(_ => InternalServerError)
       def findCharacter(name: String): IO[PrimaryError, Option[Character]] =
-        svc.findCharacter(name).mapError(_ => InternalServerError)
+        svc.findCharacter(name)
+          .mapError(_ => InternalServerError)
       def deleteCharacter(name: String): IO[PrimaryError, Boolean] =
-        svc.deleteCharacter(name).mapError(_ => InternalServerError)
+        svc.deleteCharacter(name)
+          .mapError(_ => InternalServerError)
       def deletedEvents: ZStream[Any, Nothing, String] =
         svc.deletedEvents
     }

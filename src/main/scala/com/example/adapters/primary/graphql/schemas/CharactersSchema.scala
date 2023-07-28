@@ -14,7 +14,7 @@ import zio.stream.ZStream
 
 import scala.language.postfixOps
 
-object ExampleSchema {
+object CharactersSchema {
 
   type Apis = CharactersApi
 
