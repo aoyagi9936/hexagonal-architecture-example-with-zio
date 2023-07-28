@@ -53,19 +53,19 @@ query {
     name
     nicknames
     origin
-	  role { 
-        ... on Captain {
-          shipName
-        }
-        ... on Engineer {
-          shipName
-        }
-        ... on Mechanic {
-          shipName
-        }
-        ... on Pilot {
-          shipName
-        }
+    role { 
+      ... on Captain {
+        shipName
+      }
+      ... on Engineer {
+        shipName
+      }
+      ... on Mechanic {
+        shipName
+      }
+      ... on Pilot {
+        shipName
+      }
     }
   }
 }
