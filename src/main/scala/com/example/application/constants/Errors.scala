@@ -12,7 +12,7 @@ case object ForbiddenError extends PrimaryError("FORBIDDEN_ERROR", "Permission d
 case object InternalServerError extends PrimaryError("INTERNAL_SERVER_ERROR", "An Internal Server Error has occurred. Please contact support.")
 case class RestInternalServerError(errorCode: String, message: String) extends PrimaryError("INTERNAL_SERVER_ERROR", "An Internal Server Error has occurred. Please contact support.")
 
-// Domain Layer
+// Application Layer
 sealed trait DomainError(message: String)
 final case class CharactersServiceError(cause: Throwable = new Throwable) extends DomainError(message = cause.getMessage)
 

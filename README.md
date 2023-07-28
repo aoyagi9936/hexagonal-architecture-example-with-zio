@@ -1,9 +1,9 @@
 ## What is this repository?
 
 This is a sample repository of hexagonal architecture practiced with [ZIO](https://zio.dev/).  
-Note that it is intended to efficiently standardize the API implementation of the GraphQL and Rest servers using the Caliban and Tapir libraries, and does not strictly practice the DDD pattern.  
+Note that this is not a strict practice of the DDD pattern, as it is intended to commonize the GraphQL and Rest server API implementations while separating of concerns using the Caliban and Tapir libraries.  
 
-![Hexagonal Architecture Image](https://github.com/aoyagi9936/scala-zio-hexagonal-architecture/blob/main/hexagonal_architecture.png)
+![Hexagonal Architecture Image](https://github.com/aoyagi9936/hexagonal-architecture-example-with-zio/blob/main/hexagonal_architecture.png)
 
 ## Folder Structure Summary
 
@@ -38,8 +38,45 @@ Running the application will start the GraphQL server on port 8088 and the Rest 
 The GraphQL IDE is available by accessing `http://localhost:8088/graphiql` .  
 The Swagger UI is available by accessing `http://localhost:9000/docs` .  
 
+### Start Server
+
 ```shell
 sbt run
+```
+
+### GraphQL
+
+```graphql
+query {
+  characters {
+    characterId
+    name
+    nicknames
+    origin
+	  role { 
+      ... on Captain {
+        shipName
+      }
+      ... on Engineer {
+        shipName
+      }
+      ... on Mechanic {
+        shipName
+      }
+      ... on Pilot {
+        shipName
+      }
+    }
+  }
+}
+```
+
+### Rest API
+
+```shell
+curl -X 'GET' \
+  'http://localhost:9000/api/v1/characters/list' \
+  -H 'accept: application/json'
 ```
 
 ## ZIO HTTP
