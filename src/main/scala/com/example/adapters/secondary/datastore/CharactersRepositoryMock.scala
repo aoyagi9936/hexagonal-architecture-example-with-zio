@@ -1,4 +1,4 @@
-package com.example.adapters.secondary.postgres
+package com.example.adapters.secondary.datastore
 
 import com.example.ports.secondary.CharactersRepository
 import com.example.application.constants._
@@ -27,7 +27,9 @@ final class CharactersRepositoryMock extends CharactersRepository {
   override def getById(id: CharacterId): IO[RepositoryError, Option[Character]] = ???
 
   override def update(itemId: CharacterId, data: Character): IO[RepositoryError, Option[Unit]] = ???
+}
 
+object CharactersRepositoryMock {
   val layer: ULayer[CharactersRepository] = ZLayer.succeed(
     CharactersRepositoryMock()
   )

@@ -7,7 +7,7 @@ import com.example.application.services._
 import com.example.application.config.Configuration._
 import com.example.adapters.primary.graphql.apis._
 import com.example.adapters.primary.rest.apis._
-import com.example.adapters.secondary.postgres._
+import com.example.adapters.secondary.datastore._
 
 import zio._
 
@@ -20,35 +20,29 @@ object AppContext {
   private val restServerConfig = ZLayer.fromZIO(ZIO.config[ServerConfig](RestServerConfig.config))
 
   def gqlLayer: ZLayer[Any, Throwable, GqlApp] = ZLayer.make[GqlApp](
-    // Core
-    AuthorizationFilter.layer,
-    graphqlServerConfig,
-
-    // Primary
+    // Inbound
     CharactersApiLive.layer,
 
-    // Domain
+    // Application
+    AuthorizationFilter.layer,
+    graphqlServerConfig,
     CharactersService.layer,
 
-    // Secondary
-    new CharactersRepositoryMock().layer
-
+    // Outbound
+    CharactersRepositoryMock.layer
   )
 
   def restLayer: ZLayer[Any, Throwable, RestApp] = ZLayer.make[RestApp](
-    // Core
-    AuthorizationFilter.layer,
-    restServerConfig,
-
-    // Primary
+    // Inbound
     CharactersPublicApiLive.layer,
 
-    // Domain
+    // Application
+    AuthorizationFilter.layer,
+    restServerConfig,
     CharactersService.layer,
 
-    // Secondary
-    new CharactersRepositoryMock().layer
-
+    // Outbound
+    CharactersRepositoryMock.layer
   )
 
 }
