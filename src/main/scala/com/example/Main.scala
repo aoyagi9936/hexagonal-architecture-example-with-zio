@@ -23,6 +23,7 @@ import org.http4s.Request
 import cats.data.OptionT
 import org.typelevel.ci.CIString
 import org.http4s.implicits._
+import fs2.io.net.Network
 
 import caliban.{ Http4sAdapter, GraphQLInterpreter, CalibanError }
 import caliban.interop.tapir.{ HttpInterpreter, WebSocketInterpreter }
@@ -31,15 +32,15 @@ import caliban.ResponseValue.ObjectValue
 import caliban.Value.StringValue
 import caliban.CalibanError.{ ValidationError, ParsingError }
 
-object Main extends ZIOAppDefault {
+object Main extends ZIOAppDefault {  
+
+  import sttp.tapir.json.zio._
 
   override val bootstrap: ULayer[Unit] =
     Runtime.setConfigProvider(
       TypesafeConfigProvider
         .fromResourcePath()
     ) >>> Runtime.removeDefaultLoggers >>> SLF4J.slf4j
-
-  import sttp.tapir.json.zio._
 
   type GqlAuthzTask[A] = RIO[AppContext.GqlApp, A]
 
@@ -76,6 +77,9 @@ object Main extends ZIOAppDefault {
     case err: ParsingError =>
       err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("PARSING_ERROR"))))))
   }
+
+  private implicit val nwGql: Network[GqlAuthzTask] = Network.forAsync
+  private implicit val nwRest: Network[RIO[RestResolver.Apis, *]] = Network.forAsync
 
   val graphql = (args: Chunk[String]) =>
     ZIO
