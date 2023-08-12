@@ -31,6 +31,8 @@ In all, the ZIO framework functions as a type-safe composable asynchronous proce
         └── secondary
 ```
 
+![Hexagonal Architecture Flow Image](https://github.com/aoyagi9936/hexagonal-architecture-example-with-zio/blob/main/hexagonal_architecture_flow.png)
+
 ## Application Launch
 
 This application requires Scala 3.2.2.  
