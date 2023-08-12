@@ -35,7 +35,6 @@ In all, the ZIO framework functions as a type-safe composable asynchronous proce
 
 ## Application Launch
 
-This application requires Scala 3.2.2.  
 Running the application will start the GraphQL server on port 8088 and the Rest server on port 9000.  
 The GraphQL IDE is available by accessing `http://localhost:8088/graphiql` .  
 The Swagger UI is available by accessing `http://localhost:9000/docs` .  
