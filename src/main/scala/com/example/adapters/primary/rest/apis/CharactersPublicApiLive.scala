@@ -11,11 +11,8 @@ import zio.stream.ZStream
 
 object CharactersPublicApiLive {
 
-  val layer: ZLayer[AuthorizationFilter.Service & CharactersService, PrimaryError, CharactersPublicApi] = ZLayer {
+  val layer: ZLayer[CharactersService, PrimaryError, CharactersPublicApi] = ZLayer {
     for {
-      authZ <- ZIO.service[AuthorizationFilter.Service]
-      token <- authZ.getToken
-      _     <- ZIO.log(s"""Authz Token: ${token.getOrElse("Token not found.")}""")
       svc   <- ZIO.service[CharactersService]
     } yield new CharactersPublicApi {
       def getCharacters(origin: Option[Origin]): IO[PrimaryError, List[Character]] =

@@ -52,7 +52,7 @@ object Main extends ZIOAppDefault {
             val authzTask: GqlAuthzTask[Unit] = (for {
               _ <- req.headers.get(CIString("Authorization")) match {
                 case Some(value) =>
-                  ZIO.environmentWithZIO[AuthorizationFilter.Service](_.get.setToken(
+                  ZIO.environmentWithZIO[AuthorizationFilter](_.get.setToken(
                     Option(value.head.value)
                   ))
                 case None => ZIO.unit

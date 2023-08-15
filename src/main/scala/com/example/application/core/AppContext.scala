@@ -15,8 +15,8 @@ import io.getquill.SnakeCase
 
 object AppContext {
 
-  type GqlApp  = GraphqlResolver.Apis with ServerConfig with AuthorizationFilter.Service
-  type RestApp = RestResolver.Apis with ServerConfig with AuthorizationFilter.Service
+  type GqlApp  = ServerConfig & AuthorizationFilter & GraphqlResolver.Apis
+  type RestApp = ServerConfig & RestResolver.Apis
 
   private val graphqlServerConfig = ZLayer.fromZIO(ZIO.config[ServerConfig](GraphQLServerConfig.config))
   private val restServerConfig    = ZLayer.fromZIO(ZIO.config[ServerConfig](RestServerConfig.config))
@@ -44,7 +44,6 @@ object AppContext {
     CharactersPublicApiLive.layer,
 
     // Application
-    AuthorizationFilter.layer,
     restServerConfig,
     CharactersService.layer,
     // dataSourceLayer,
