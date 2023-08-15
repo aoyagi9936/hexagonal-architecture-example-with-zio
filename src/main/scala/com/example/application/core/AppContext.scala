@@ -10,6 +10,8 @@ import com.example.adapters.primary.rest.apis._
 import com.example.adapters.secondary.datastore._
 
 import zio._
+import io.getquill.jdbczio.Quill
+import io.getquill.SnakeCase
 
 object AppContext {
 
@@ -17,7 +19,9 @@ object AppContext {
   type RestApp = RestResolver.Apis with ServerConfig with AuthorizationFilter.Service
 
   private val graphqlServerConfig = ZLayer.fromZIO(ZIO.config[ServerConfig](GraphQLServerConfig.config))
-  private val restServerConfig = ZLayer.fromZIO(ZIO.config[ServerConfig](RestServerConfig.config))
+  private val restServerConfig    = ZLayer.fromZIO(ZIO.config[ServerConfig](RestServerConfig.config))
+  private val dataSourceLayer     = Quill.DataSource.fromPrefix("postgres-db")
+  private val postgresLayer       = Quill.Postgres.fromNamingStrategy(SnakeCase)
 
   def gqlLayer: ZLayer[Any, Throwable, GqlApp] = ZLayer.make[GqlApp](
     // Inbound
@@ -27,9 +31,12 @@ object AppContext {
     AuthorizationFilter.layer,
     graphqlServerConfig,
     CharactersService.layer,
+    // dataSourceLayer,
+    // postgresLayer,
 
     // Outbound
-    CharactersRepositoryMock.layer
+    CharactersRepositoryMock.layer,
+    // CharactersRepositoryLive.layer,
   )
 
   def restLayer: ZLayer[Any, Throwable, RestApp] = ZLayer.make[RestApp](
@@ -40,9 +47,12 @@ object AppContext {
     AuthorizationFilter.layer,
     restServerConfig,
     CharactersService.layer,
+    // dataSourceLayer,
+    // postgresLayer,
 
     // Outbound
-    CharactersRepositoryMock.layer
+    CharactersRepositoryMock.layer,
+    // CharactersRepositoryLive.layer,
   )
 
 }
