@@ -5,6 +5,8 @@ Note that this is not a strict practice of the DDD pattern, as it is intended to
 
 ![Hexagonal Architecture Image](https://github.com/aoyagi9936/hexagonal-architecture-example-with-zio/blob/main/hexagonal_architecture.png)
 
+[Explanatory article (Japanese)](https://qiita.com/aoyagi9936/items/373badc780a078aa0db7)
+
 ## Folder Structure Summary
 
 Start each server in `Main.scala` and inject dependencies in `AppContext.scala` .  
