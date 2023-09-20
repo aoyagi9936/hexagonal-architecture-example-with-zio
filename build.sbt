@@ -28,9 +28,10 @@ lazy val root = (project in file("."))
         ExclusionRule(organization = "org.scala-lang.modules"),
         ExclusionRule(organization = "org.scalameta"),
       ),
-      "org.postgresql" % "postgresql"          % postgresqlVersion,
-      "dev.zio"       %% "zio-config"          % zioConfigVersion,
-      "dev.zio"       %% "zio-config-typesafe" % zioConfigVersion,
+      "org.postgresql"   % "postgresql"          % postgresqlVersion,
+      "dev.zio"         %% "zio-config"          % zioConfigVersion,
+      "dev.zio"         %% "zio-config-typesafe" % zioConfigVersion,
+      "com.github.ghik" %% "silencer-lib"        % "1.4.2" % Provided cross CrossVersion.for3Use2_13, // https://github.com/zio/zio-config/issues/1245
 
       // logging
       "dev.zio"       %% "zio-logging"       % zioLoggingVersion,
