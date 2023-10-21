@@ -28,7 +28,7 @@ object RestResolver {
   val routes = ZHttp4sServerInterpreter()
     .from(
       List(
-        CharactersPublicEndpoint.charactersLogic.widen[Apis]
+        CharactersPublicEndpoint.charactersLogic.widen[CharactersPublicEndpoint.Apis]
       )
     )
     .toRoutes[Apis] <+> swaggerRoutes
