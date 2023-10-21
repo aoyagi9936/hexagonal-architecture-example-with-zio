@@ -146,6 +146,7 @@ object Main extends ZIOAppDefault {
     (for {
       args <- getArgs
       _    <- graphql(args) zipPar rest(args)
+      
     } yield()).exitCode
 
 }

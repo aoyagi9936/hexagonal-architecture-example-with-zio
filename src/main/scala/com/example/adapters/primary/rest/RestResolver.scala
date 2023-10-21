@@ -31,5 +31,5 @@ object RestResolver {
         CharactersPublicEndpoint.charactersLogic.widen[Apis]
       )
     )
-    .toRoutes <+> swaggerRoutes
+    .toRoutes[Apis] <+> swaggerRoutes
 }
