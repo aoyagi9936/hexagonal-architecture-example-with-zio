@@ -19,6 +19,8 @@ final class CharactersRepositoryLive(quill: Quill.Postgres[SnakeCase]) extends C
 
   override def getAll(): IO[RepositoryError, List[Character]] = ???
 
+  override def filter(origin: Origin): IO[RepositoryError, List[Character]] = ???
+
   override def getById(id: CharacterId): IO[RepositoryError, Option[Character]] = ???
 
   override def update(itemId: CharacterId, data: Character): IO[RepositoryError, Option[Unit]] = ???

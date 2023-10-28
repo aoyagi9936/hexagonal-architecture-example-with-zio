@@ -20,7 +20,8 @@ object RestResolver {
       .from(
         SwaggerInterpreter().fromEndpoints[RIO[Apis, *]](
           List(
-            CharactersPublicEndpoint.charactersEndpoint
+            CharactersPublicEndpoint.charactersEndpoint,
+            CharactersPublicEndpoint.characterEndpoint,
           ), "Example Rest API", "1.0")
       )
       .toRoutes
@@ -28,7 +29,8 @@ object RestResolver {
   val routes = ZHttp4sServerInterpreter()
     .from(
       List(
-        CharactersPublicEndpoint.charactersLogic.widen[CharactersPublicEndpoint.Apis]
+        CharactersPublicEndpoint.charactersLogic.widen[CharactersPublicEndpoint.Apis],
+        CharactersPublicEndpoint.characterLogic.widen[CharactersPublicEndpoint.Apis]
       )
     )
     .toRoutes[Apis] <+> swaggerRoutes

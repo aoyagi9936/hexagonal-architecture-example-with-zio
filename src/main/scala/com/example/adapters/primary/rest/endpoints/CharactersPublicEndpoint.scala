@@ -23,6 +23,10 @@ object CharactersPublicEndpoint {
       .errorOut(
         oneOf[PrimaryError](
           oneOfVariant(
+            statusCode(StatusCode.NotFound)
+              .and(jsonBody[RestNotFoundError])
+          ),
+          oneOfVariant(
             statusCode(StatusCode.InternalServerError)
               .and(jsonBody[RestInternalServerError])
           )
@@ -35,8 +39,18 @@ object CharactersPublicEndpoint {
       .in(originMaybeQuery)
       .out(jsonBody[List[Character]])
 
+  val characterEndpoint: PublicEndpoint[CharacterId, PrimaryError, Character, Any] =
+    baseEndpoint.get
+      .in("character" / "get")
+      .in(characterIdQuery)
+      .out(jsonBody[Character])
+
   val charactersLogic = charactersEndpoint.zServerLogic {
     origin => CharactersPublicApi.getCharacters(origin)
+  }
+
+  val characterLogic = characterEndpoint.zServerLogic {
+    id => CharactersPublicApi.findCharacter(id)
   }
 
 }

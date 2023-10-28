@@ -5,7 +5,7 @@ package object schemas {
   import com.example.application.models.CharactersData._
 
   sealed case class CharactersArgs(origin: Option[Origin])
-  sealed case class CharacterArgs(name: String)
+  sealed case class CharacterArgs(id: CharacterId)
 
 }
 

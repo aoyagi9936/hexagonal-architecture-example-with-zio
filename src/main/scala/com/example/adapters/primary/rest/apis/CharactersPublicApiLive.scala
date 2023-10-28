@@ -17,10 +17,19 @@ object CharactersPublicApiLive {
     } yield new CharactersPublicApi {
       def getCharacters(origin: Option[Origin]): IO[PrimaryError, List[Character]] =
         svc.getCharacters(origin)
-          .mapError(_ => InternalServerError)
-      def findCharacter(name: String): IO[PrimaryError, Option[Character]] =
-        svc.findCharacter(name)
-          .mapError(_ => InternalServerError)
+          .foldZIO(
+            error   => ZIO.fail(RestInternalServerError()),
+            success => ZIO.succeed(success)
+          )
+      def findCharacter(id: CharacterId): IO[PrimaryError, Character] =
+        svc.findCharacter(id)
+          .foldZIO(
+            error => error match {
+              case _:CharacterNotFoundError => ZIO.fail(RestNotFoundError())
+              case _:CharactersServiceError => ZIO.fail(RestInternalServerError())
+            },
+            success => ZIO.succeed(success)
+          )
     }
   }
 
