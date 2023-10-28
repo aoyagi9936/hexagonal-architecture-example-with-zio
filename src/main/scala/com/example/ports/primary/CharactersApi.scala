@@ -8,9 +8,9 @@ import zio.{ IO, ZIO }
 trait CharactersApi:
     def getCharacters(origin: Option[Origin]): IO[PrimaryError, List[Character]]
 
-    def findCharacter(name: String): IO[PrimaryError, Option[Character]]
+    def findCharacter(id: CharacterId): IO[PrimaryError, Character]
 
-    def deleteCharacter(name: String): IO[PrimaryError, Boolean]
+    def deleteCharacter(id: CharacterId): IO[PrimaryError, Boolean]
 
     def deletedEvents: ZStream[Any, Nothing, String]
 
@@ -18,11 +18,11 @@ object CharactersApi:
   def getCharacters(origin: Option[Origin]): ZIO[CharactersApi, PrimaryError, List[Character]] =
     ZIO.serviceWithZIO(_.getCharacters(origin))
 
-  def findCharacter(name: String): ZIO[CharactersApi, PrimaryError, Option[Character]] =
-    ZIO.serviceWithZIO(_.findCharacter(name))
+  def findCharacter(id: CharacterId): ZIO[CharactersApi, PrimaryError, Character] =
+    ZIO.serviceWithZIO(_.findCharacter(id))
 
-  def deleteCharacter(name: String): ZIO[CharactersApi, PrimaryError, Boolean] =
-    ZIO.serviceWithZIO(_.deleteCharacter(name))
+  def deleteCharacter(id: CharacterId): ZIO[CharactersApi, PrimaryError, Boolean] =
+    ZIO.serviceWithZIO(_.deleteCharacter(id))
 
   def deletedEvents: ZStream[CharactersApi, Nothing, String] =
     ZStream.serviceWithStream(_.deletedEvents)

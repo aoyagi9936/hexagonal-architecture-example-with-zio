@@ -12,6 +12,8 @@ trait CharactersRepository:
 
   def getAll(): IO[SecondaryError, List[Character]]
 
+  def filter(origin: Origin): IO[SecondaryError, List[Character]]
+
   def getById(id: CharacterId): IO[SecondaryError, Option[Character]]
 
   def update(itemId: CharacterId, data: Character): IO[SecondaryError, Option[Unit]]
@@ -25,6 +27,9 @@ object CharactersRepository:
 
   def getAll(): ZIO[CharactersRepository, SecondaryError, List[Character]] =
     ZIO.serviceWithZIO[CharactersRepository](_.getAll())
+
+  def filter(origin: Origin): ZIO[CharactersRepository, SecondaryError, List[Character]] =
+    ZIO.serviceWithZIO[CharactersRepository](_.filter(origin))
 
   def getById(id: CharacterId): ZIO[CharactersRepository, SecondaryError, Option[Character]] =
     ZIO.serviceWithZIO[CharactersRepository](_.getById(id))

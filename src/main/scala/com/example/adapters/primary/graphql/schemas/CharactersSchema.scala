@@ -6,12 +6,15 @@ import com.example.ports.primary.CharactersApi
 
 import caliban.graphQL
 import caliban.RootResolver
+import caliban.Value
+import caliban.CalibanError.ExecutionError
 import caliban.schema.Annotations.{ GQLDeprecated, GQLDescription }
 import caliban.schema.{ ArgBuilder, Schema }
 
 import zio._
 import zio.stream.ZStream
 
+import scala.util.Try
 import scala.language.postfixOps
 
 object CharactersSchema {
@@ -22,7 +25,7 @@ object CharactersSchema {
     @GQLDescription("Return all characters from a given origin")
     characters: CharactersArgs => ZIO[Apis, PrimaryError, List[Character]],
     @GQLDeprecated("Use `characters`")
-    character: CharacterArgs   => ZIO[Apis, PrimaryError, Option[Character]]
+    character: CharacterArgs   => ZIO[Apis, PrimaryError, Character]
   )
   case class Mutations(deleteCharacter: CharacterArgs => ZIO[Apis, PrimaryError, Boolean])
   case class Subscriptions(characterDeleted: ZStream[Apis, Nothing, String])
@@ -33,7 +36,13 @@ object CharactersSchema {
 
   // Request
   given Schema[Any, CharacterArgs]  = Schema.gen
-  given ArgBuilder[CharacterArgs]   = ArgBuilder.gen
+  given ArgBuilder[CharacterId] = {
+    case Value.StringValue(value) =>
+      Try(CharacterId(value))
+        .fold(ex => Left(ExecutionError(s"Can't parse $value into a CharacterId", innerThrowable = Some(ex))), Right(_))
+    case other => Left(ExecutionError(s"Can't build a CharacterId from input $other"))
+  }
+  given ArgBuilder[CharacterArgs]   = ArgBuilder.derived
   given Schema[Any, CharactersArgs] = Schema.gen
   given ArgBuilder[CharactersArgs]  = ArgBuilder.Auto.derived
 
@@ -51,9 +60,9 @@ object CharactersSchema {
       RootResolver(
         Queries(
           args => CharactersApi.getCharacters(args.origin),
-          args => CharactersApi.findCharacter(args.name)
+          args => CharactersApi.findCharacter(args.id)
         ),
-        Mutations(args => CharactersApi.deleteCharacter(args.name)),
+        Mutations(args => CharactersApi.deleteCharacter(args.id)),
         Subscriptions(CharactersApi.deletedEvents)
       )
     )
