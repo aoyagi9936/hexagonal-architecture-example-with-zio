@@ -3,11 +3,9 @@ package com.example.adapters.primary.rest.endpoints
 import sttp.tapir._
 import sttp.tapir.ztapir._
 import sttp.tapir.json.zio._
-import sttp.capabilities.WebSockets
-import sttp.capabilities.zio.ZioStreams
+import sttp.tapir.Codec.PlainCodec
+
 import zio.json._
-import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
-import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import com.example.application.constants._
 import com.example.application.models.CharactersData._
@@ -16,8 +14,9 @@ object TapirSupport extends Tapir
     with ZTapir
     with TapirJsonZio {
 
-  given JsonCodec[Origin] = DeriveJsonCodec.gen
-  given JsonCodec[Role]   = DeriveJsonCodec.gen
+  given JsonCodec[Origin]  = DeriveJsonCodec.gen
+  given PlainCodec[Origin] = Codec.derivedEnumeration[String, Origin].defaultStringBased
+  given JsonCodec[Role]    = DeriveJsonCodec.gen
 
   given JsonDecoder[CharacterId] = JsonDecoder[String].map(CharacterId(_))
   given JsonEncoder[CharacterId] = JsonEncoder[String].contramap(_.value)
@@ -25,7 +24,7 @@ object TapirSupport extends Tapir
   given JsonCodec[RestInternalServerError] = DeriveJsonCodec.gen
   given JsonCodec[RestNotFoundError] = DeriveJsonCodec.gen
 
-  given Schema[Origin]      = Schema.derived
+  given Schema[Origin]      = Schema.derivedEnumeration.defaultStringBased
   given Schema[Role]        = Schema.derived
   given Schema[CharacterId] = Schema.string
   given Schema[Character]   = Schema.derived
@@ -33,9 +32,10 @@ object TapirSupport extends Tapir
   given Schema[RestNotFoundError]       = Schema.derived
 
   val originMaybeQuery: EndpointInput.Query[Option[Origin]] =
-    jsonQuery[Option[Origin]]("origin")
+    query[Option[Origin]]("origin")
 
   val characterIdQuery: EndpointInput.Query[CharacterId] =
-    jsonQuery[CharacterId]("id")
+    query[CharacterId]("id")
+
 }
 
