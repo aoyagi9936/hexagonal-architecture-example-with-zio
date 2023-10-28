@@ -14,9 +14,10 @@ object TapirSupport extends Tapir
     with ZTapir
     with TapirJsonZio {
 
-  given JsonCodec[Origin]  = DeriveJsonCodec.gen
-  given PlainCodec[Origin] = Codec.derivedEnumeration[String, Origin].defaultStringBased
-  given JsonCodec[Role]    = DeriveJsonCodec.gen
+  given JsonCodec[Origin]   = DeriveJsonCodec.gen
+  given PlainCodec[Origin]  = Codec.derivedEnumeration[String, Origin].defaultStringBased
+  given JsonEncoder[Origin] = JsonEncoder[String].contramap(_.toString)
+  given JsonCodec[Role]     = DeriveJsonCodec.gen
 
   given JsonDecoder[CharacterId] = JsonDecoder[String].map(CharacterId(_))
   given JsonEncoder[CharacterId] = JsonEncoder[String].contramap(_.value)
