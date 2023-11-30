@@ -1,4 +1,4 @@
-package com.example.infrastructure.postgresql
+package com.example.secondary.postgresql
 
 import java.sql.{ Connection, DriverManager, SQLException }
 import java.util.Properties

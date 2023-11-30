@@ -30,3 +30,4 @@ final case class CharactersServiceError(cause: Throwable = new Throwable) extend
 // Secondary Layer
 sealed trait SecondaryError(message: String)
 final case class RepositoryError(cause: Throwable = new Throwable) extends SecondaryError(message = cause.getMessage)
+final case class DuplicateDataError(cause: Throwable = new Throwable) extends SecondaryError(message = cause.getMessage)
