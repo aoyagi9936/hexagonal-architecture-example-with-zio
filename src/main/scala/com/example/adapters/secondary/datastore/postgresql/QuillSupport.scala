@@ -1,4 +1,4 @@
-package com.example.adapters.secondary.datastore
+package com.example.adapters.secondary.datastore.postgresql
 
 import io.getquill._
 import java.time.LocalDateTime

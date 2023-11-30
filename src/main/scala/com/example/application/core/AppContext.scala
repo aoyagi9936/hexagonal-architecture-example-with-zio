@@ -7,7 +7,7 @@ import com.example.application.services._
 import com.example.application.config.Configuration._
 import com.example.adapters.primary.graphql.apis._
 import com.example.adapters.primary.rest.apis._
-import com.example.adapters.secondary.datastore._
+import com.example.adapters.secondary.datastore.postgresql._
 
 import zio._
 import io.getquill.jdbczio.Quill

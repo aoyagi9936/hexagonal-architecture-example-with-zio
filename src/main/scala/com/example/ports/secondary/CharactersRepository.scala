@@ -16,7 +16,7 @@ trait CharactersRepository:
 
   def getById(id: CharacterId): IO[SecondaryError, Option[Character]]
 
-  def update(itemId: CharacterId, data: Character): IO[SecondaryError, Option[Unit]]
+  def update(id: CharacterId, data: Character): IO[SecondaryError, Option[Unit]]
 
 object CharactersRepository:
   def add(data: Character): ZIO[CharactersRepository, SecondaryError, CharacterId] =
@@ -34,5 +34,5 @@ object CharactersRepository:
   def getById(id: CharacterId): ZIO[CharactersRepository, SecondaryError, Option[Character]] =
     ZIO.serviceWithZIO[CharactersRepository](_.getById(id))
 
-  def update(itemId: CharacterId, data: Character): ZIO[CharactersRepository, SecondaryError, Option[Unit]] =
-    ZIO.serviceWithZIO[CharactersRepository](_.update(itemId, data))
+  def update(id: CharacterId, data: Character): ZIO[CharactersRepository, SecondaryError, Option[Unit]] =
+    ZIO.serviceWithZIO[CharactersRepository](_.update(id, data))

@@ -1,4 +1,4 @@
-package com.example.infrastructure.postgresql
+package com.example.secondary.postgresql
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
@@ -14,7 +14,7 @@ object PostgresContainer:
         val c = new PostgreSQLContainer(
           dockerImageNameOverride = Option(imageName).map(DockerImageName.parse)
         ).configure { a =>
-          a.withInitScript("item_schema.sql")
+          a.withInitScript("schema.sql")
           ()
         }
         c.start()
