@@ -4,7 +4,6 @@ import com.example.application.models.CharactersData._
 import com.example.ports.secondary.CharactersRepository
 import com.example.adapters.secondary.datastore.postgresql.CharactersRepositoryLive
 
-import io.getquill.PluralizedTableNames
 import io.getquill._
 import io.getquill.jdbczio.Quill
 
