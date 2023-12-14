@@ -4,8 +4,14 @@ package object schemas {
 
   import com.example.application.models.CharactersData._
 
-  sealed case class CharactersArgs(origin: Option[Origin])
-  sealed case class CharacterArgs(id: CharacterId)
+  final case class GetCharactersArgs(origin: Option[Origin])
+  final case class GetCharacterArgs(id: CharacterId)
+  final case class RoleArg(kind: String, shipName: String)
+  final case class AddCharacterArgs(
+    name: String, nicknames: List[String], origin: Origin, role: Option[RoleArg])
+  final case class UpdCharacterArgs(
+    id: CharacterId, name: String, nicknames: List[String], origin: Origin, role: Option[RoleArg])
+  final case class DelCharacterArgs(id: CharacterId)
 
 }
 

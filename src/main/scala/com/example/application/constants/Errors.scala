@@ -24,7 +24,8 @@ case class RestInternalServerError(
 
 // Application Layer
 sealed trait DomainError(message: String)
-final case class CharacterNotFoundError(cause: Throwable = new Throwable) extends DomainError(message = cause.getMessage)
+final case class DataNotFoundError(cause: Throwable = new Throwable) extends DomainError(message = cause.getMessage)
+final case class DataConflictError(cause: Throwable = new Throwable) extends DomainError(message = cause.getMessage)
 final case class CharactersServiceError(cause: Throwable = new Throwable) extends DomainError(message = cause.getMessage)
 
 // Secondary Layer

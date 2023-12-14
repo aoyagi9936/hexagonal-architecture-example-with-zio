@@ -8,6 +8,7 @@ import entities.{ Character => CharacterTbl, Role => RoleTbl }
 import zio.{ ZIO, IO, ZLayer, URLayer }
 import io.getquill._
 import io.getquill.jdbczio.Quill
+import enumeratum._
 
 import java.sql.SQLException
 
@@ -40,8 +41,8 @@ final class CharactersRepositoryLive(quill: Quill.Postgres[SnakeCase]) extends C
           role.insertValue(
             lift(RoleTbl(
               data.characterId.value,
-              Role.getString(r),
-              Role.getShipName(r),
+              r.roleName,
+              r.shipName,
             ))
           )
         }
@@ -81,7 +82,7 @@ final class CharactersRepositoryLive(quill: Quill.Postgres[SnakeCase]) extends C
           CharacterId(v._1.characterId),
           v._1.characterName,
           v._1.nicknames,
-          Origin.fromString(v._1.originType),
+          Origin.withName(v._1.originType),
           v._2.map(r => Role.fromString(r.roleType, r.shipName)),
         ))
       )
@@ -103,7 +104,7 @@ final class CharactersRepositoryLive(quill: Quill.Postgres[SnakeCase]) extends C
           CharacterId(v._1.characterId),
           v._1.characterName,
           v._1.nicknames,
-          Origin.fromString(v._1.originType),
+          Origin.withName(v._1.originType),
           v._2.map(r => Role.fromString(r.roleType, r.shipName)),
         ))
       )
@@ -121,7 +122,7 @@ final class CharactersRepositoryLive(quill: Quill.Postgres[SnakeCase]) extends C
         CharacterId(v._1.characterId),
         v._1.characterName,
         v._1.nicknames,
-        Origin.fromString(v._1.originType),
+        Origin.withName(v._1.originType),
         v._2.map(r => Role.fromString(r.roleType, r.shipName)),
       )
     ))
@@ -151,8 +152,8 @@ final class CharactersRepositoryLive(quill: Quill.Postgres[SnakeCase]) extends C
                 .filter(_.characterId == lift(id.value))
                 .updateValue(lift(RoleTbl(
                   id.value,
-                  Role.getString(r),
-                  Role.getShipName(r),
+                  r.roleName,
+                  r.shipName,
                 )))
             }
           case None =>

@@ -1,10 +1,11 @@
-val calibanVersion        = "2.4.1"
+val calibanVersion        = "2.4.3"
 val tapirVersion          = "1.8.2"
 val zioVersion            = "2.0.18"
 val zioConfigVersion      = "4.0.0-RC16"
 val zioLoggingVersion     = "2.1.14"
 val logbackClassicVersion = "1.4.4"
 val postgresqlVersion     = "42.5.0"
+val enumeratumVersion     = "1.7.3"
 val quillVersion          = "4.8.0"
 val testContainersVersion = "0.41.0"
 
@@ -32,6 +33,7 @@ lazy val root = (project in file("."))
       "org.postgresql"   % "postgresql"          % postgresqlVersion,
       "dev.zio"         %% "zio-config"          % zioConfigVersion,
       "dev.zio"         %% "zio-config-typesafe" % zioConfigVersion,
+      "com.beachape"    %% "enumeratum"          % enumeratumVersion,
       "com.github.ghik" %% "silencer-lib"        % "1.4.2" % Provided cross CrossVersion.for3Use2_13, // https://github.com/zio/zio-config/issues/1245
 
       // logging

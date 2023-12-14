@@ -5,8 +5,9 @@ import com.example.application.core.AuthorizationFilter
 import com.example.application.models.CharactersData._
 import com.example.application.services.CharactersService
 import com.example.ports.primary.CharactersApi
+import com.example.adapters.primary.graphql.schemas.RoleArg
 
-import zio.{ZIO, IO, ZLayer}
+import zio.{ZIO, IO, ZLayer, Random}
 import zio.stream.ZStream
 
 object CharactersApiLive {
@@ -22,14 +23,42 @@ object CharactersApiLive {
       def findCharacter(id: CharacterId): IO[PrimaryError, Character] =
         svc.findCharacter(id)
           .mapError {
-              case _:CharacterNotFoundError => NotFoundError
-              case _:CharactersServiceError => InternalServerError
+              case _:DataNotFoundError => NotFoundError
+              case _                   => InternalServerError
+          }
+      def addCharacter(name: String, nicknames: List[String], origin: Origin, role: Option[RoleArg]): IO[PrimaryError, CharacterId] =
+        for {
+          id <- Random.nextUUID
+          c  <- ZIO.succeed(
+            Character(
+              CharacterId(id.toString()),
+              name,
+              nicknames,
+              origin,
+              role.map(v => Role.fromString(v.kind, v.shipName))
+            )
+          )
+          r <- svc.addCharacter(c)
+          .mapError(_ => InternalServerError)
+        } yield r
+
+      def updateCharacter(id: CharacterId, name: String, nicknames: List[String], origin: Origin, role: Option[RoleArg]): IO[PrimaryError, Boolean] =
+        svc.updateCharacter(Character(
+          id,
+          name,
+          nicknames,
+          origin,
+          role.map(v => Role.fromString(v.kind, v.shipName))
+        ))
+          .mapError {
+              case _:DataNotFoundError => NotFoundError
+              case _                   => InternalServerError
           }
       def deleteCharacter(id: CharacterId): IO[PrimaryError, Boolean] =
         svc.deleteCharacter(id)
           .mapError {
-              case _:CharacterNotFoundError => NotFoundError
-              case _:CharactersServiceError => InternalServerError
+              case _:DataNotFoundError => NotFoundError
+              case _                   => InternalServerError
           }
       def deletedEvents: ZStream[Any, Nothing, String] =
         svc.deletedEvents
