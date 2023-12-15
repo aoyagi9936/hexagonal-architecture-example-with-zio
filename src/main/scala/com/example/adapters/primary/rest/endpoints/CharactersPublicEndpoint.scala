@@ -45,12 +45,24 @@ object CharactersPublicEndpoint {
       .in(characterIdQuery)
       .out(jsonBody[Character])
 
+  val addCharacterEndpoint: PublicEndpoint[AddCharacterArgs, PrimaryError, CharacterId, Any] =
+    baseEndpoint.post
+      .in("character" / "insert")
+      .in(jsonBody[AddCharacterArgs])
+      .out(jsonBody[CharacterId])
+
   val charactersLogic = charactersEndpoint.zServerLogic {
     origin => CharactersPublicApi.getCharacters(origin)
   }
 
   val characterLogic = characterEndpoint.zServerLogic {
     id => CharactersPublicApi.findCharacter(id)
+  }
+
+  val addCharacterLogic = addCharacterEndpoint.zServerLogic {
+    c => CharactersPublicApi.addCharacter(
+      c.name, c.nicknames, c.origin, c.role
+    )
   }
 
 }

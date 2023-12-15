@@ -39,7 +39,7 @@ object CharactersSchema {
   given Schema[Any, Role]   = Schema.Auto.derived
 
   // Request
-  given Schema[Any, RoleArg]          = Schema.gen
+  given Schema[Any, RoleReq]          = Schema.gen
   given Schema[Any, GetCharacterArgs] = Schema.gen
   given ArgBuilder[CharacterId] = {
     case Value.StringValue(value) =>

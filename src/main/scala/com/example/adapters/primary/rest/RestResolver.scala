@@ -22,6 +22,7 @@ object RestResolver {
           List(
             CharactersPublicEndpoint.charactersEndpoint,
             CharactersPublicEndpoint.characterEndpoint,
+            CharactersPublicEndpoint.addCharacterEndpoint,
           ), "Example Rest API", "1.0")
       )
       .toRoutes
@@ -30,7 +31,8 @@ object RestResolver {
     .from(
       List(
         CharactersPublicEndpoint.charactersLogic.widen[CharactersPublicEndpoint.Apis],
-        CharactersPublicEndpoint.characterLogic.widen[CharactersPublicEndpoint.Apis]
+        CharactersPublicEndpoint.characterLogic.widen[CharactersPublicEndpoint.Apis],
+        CharactersPublicEndpoint.addCharacterLogic.widen[CharactersPublicEndpoint.Apis],
       )
     )
     .toRoutes[Apis] <+> swaggerRoutes

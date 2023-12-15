@@ -6,11 +6,10 @@ package object schemas {
 
   final case class GetCharactersArgs(origin: Option[Origin])
   final case class GetCharacterArgs(id: CharacterId)
-  final case class RoleArg(kind: String, shipName: String)
   final case class AddCharacterArgs(
-    name: String, nicknames: List[String], origin: Origin, role: Option[RoleArg])
+    name: String, nicknames: List[String], origin: Origin, role: Option[RoleReq])
   final case class UpdCharacterArgs(
-    id: CharacterId, name: String, nicknames: List[String], origin: Origin, role: Option[RoleArg])
+    id: CharacterId, name: String, nicknames: List[String], origin: Origin, role: Option[RoleReq])
   final case class DelCharacterArgs(id: CharacterId)
 
 }

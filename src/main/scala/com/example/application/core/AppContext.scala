@@ -10,6 +10,7 @@ import com.example.adapters.primary.rest.apis._
 import com.example.adapters.secondary.datastore.postgresql._
 
 import zio._
+import zio.uuid._
 import io.getquill.jdbczio.Quill
 import io.getquill.SnakeCase
 
@@ -31,6 +32,7 @@ object AppContext {
     AuthorizationFilter.layer,
     graphqlServerConfig,
     CharactersService.layer,
+    TypeIDGenerator.live,
     // dataSourceLayer,
     // postgresLayer,
 
@@ -46,6 +48,7 @@ object AppContext {
     // Application
     restServerConfig,
     CharactersService.layer,
+    TypeIDGenerator.live,
     // dataSourceLayer,
     // postgresLayer,
 

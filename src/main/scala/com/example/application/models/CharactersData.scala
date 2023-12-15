@@ -6,6 +6,7 @@ object CharactersData {
 
   final case class CharacterId(value: String) extends AnyVal
   final case class Character(characterId: CharacterId, name: String, nicknames: List[String], origin: Origin, role: Option[Role])
+  final case class RoleReq(kind: String, shipName: String)
 
   sealed trait Origin extends EnumEntry
   object Origin extends Enum[Origin] {
@@ -34,11 +35,11 @@ object CharactersData {
       override def roleName: String = "Mechanic"
     }
 
-    def fromString(s: String, n: String): Role = s.toLowerCase match {
-      case "captain"  => Captain(n)
-      case "pilot"    => Pilot(n)
-      case "engineer" => Engineer(n)
-      case "mechanic" => Mechanic(n)
+    def fromString(roleName: String, shipName: String): Role = roleName.toLowerCase match {
+      case "captain"  => Captain(shipName)
+      case "pilot"    => Pilot(shipName)
+      case "engineer" => Engineer(shipName)
+      case "mechanic" => Mechanic(shipName)
     }
 
   }

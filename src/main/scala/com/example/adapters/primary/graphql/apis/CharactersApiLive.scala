@@ -5,15 +5,16 @@ import com.example.application.core.AuthorizationFilter
 import com.example.application.models.CharactersData._
 import com.example.application.services.CharactersService
 import com.example.ports.primary.CharactersApi
-import com.example.adapters.primary.graphql.schemas.RoleArg
 
 import zio.{ZIO, IO, ZLayer, Random}
 import zio.stream.ZStream
+import zio.uuid.*
 
 object CharactersApiLive {
 
-  val layer: ZLayer[AuthorizationFilter & CharactersService, PrimaryError, CharactersApi] = ZLayer {
+  val layer: ZLayer[AuthorizationFilter & CharactersService & TypeIDGenerator, PrimaryError, CharactersApi] = ZLayer {
     for {
+      idGen <- ZIO.service[TypeIDGenerator]
       authZ <- ZIO.service[AuthorizationFilter]
       svc   <- ZIO.service[CharactersService]
     } yield new CharactersApi {
@@ -26,12 +27,13 @@ object CharactersApiLive {
               case _:DataNotFoundError => NotFoundError
               case _                   => InternalServerError
           }
-      def addCharacter(name: String, nicknames: List[String], origin: Origin, role: Option[RoleArg]): IO[PrimaryError, CharacterId] =
+      def addCharacter(name: String, nicknames: List[String], origin: Origin, role: Option[RoleReq]): IO[PrimaryError, CharacterId] =
         for {
-          id <- Random.nextUUID
+          id <- idGen.typeid("char")
+          .mapError(_ => InternalServerError)
           c  <- ZIO.succeed(
             Character(
-              CharacterId(id.toString()),
+              CharacterId(id.value),
               name,
               nicknames,
               origin,
@@ -42,7 +44,7 @@ object CharactersApiLive {
           .mapError(_ => InternalServerError)
         } yield r
 
-      def updateCharacter(id: CharacterId, name: String, nicknames: List[String], origin: Origin, role: Option[RoleArg]): IO[PrimaryError, Boolean] =
+      def updateCharacter(id: CharacterId, name: String, nicknames: List[String], origin: Origin, role: Option[RoleReq]): IO[PrimaryError, Boolean] =
         svc.updateCharacter(Character(
           id,
           name,

@@ -8,11 +8,13 @@ import com.example.ports.primary.CharactersPublicApi
 
 import zio.{ZIO, IO, ZLayer}
 import zio.stream.ZStream
+import zio.uuid.*
 
 object CharactersPublicApiLive {
 
-  val layer: ZLayer[CharactersService, PrimaryError, CharactersPublicApi] = ZLayer {
+  val layer: ZLayer[CharactersService & TypeIDGenerator, PrimaryError, CharactersPublicApi] = ZLayer {
     for {
+      idGen <- ZIO.service[TypeIDGenerator]
       svc   <- ZIO.service[CharactersService]
     } yield new CharactersPublicApi {
       def getCharacters(origin: Option[Origin]): IO[PrimaryError, List[Character]] =
@@ -30,6 +32,22 @@ object CharactersPublicApiLive {
             },
             success => ZIO.succeed(success)
           )
+      def addCharacter(name: String, nicknames: List[String], origin: Origin, role: Option[RoleReq]): IO[PrimaryError, CharacterId] =
+        for {
+          id <- idGen.typeid("pubchar")
+          .mapError(_ => InternalServerError)
+          c  <- ZIO.succeed(
+            Character(
+              CharacterId(id.value),
+              name,
+              nicknames,
+              origin,
+              role.map(v => Role.fromString(v.kind, v.shipName))
+            )
+          )
+          r <- svc.addCharacter(c)
+          .mapError(_ => InternalServerError)
+        } yield r
     }
   }
 
