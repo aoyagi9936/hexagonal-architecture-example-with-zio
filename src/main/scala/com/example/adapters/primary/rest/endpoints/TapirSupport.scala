@@ -10,18 +10,22 @@ import zio.json._
 import com.example.application.constants._
 import com.example.application.models.CharactersData._
 
+import enumeratum._
+
 object TapirSupport extends Tapir
     with ZTapir
     with TapirJsonZio {
 
-  given JsonCodec[Origin]   = DeriveJsonCodec.gen
   given PlainCodec[Origin]  = Codec.derivedEnumeration[String, Origin].defaultStringBased
+  given JsonDecoder[Origin] = JsonDecoder[String].map(Origin.withName(_))
   given JsonEncoder[Origin] = JsonEncoder[String].contramap(_.toString)
   given JsonCodec[Role]     = DeriveJsonCodec.gen
-
   given JsonDecoder[CharacterId] = JsonDecoder[String].map(CharacterId(_))
   given JsonEncoder[CharacterId] = JsonEncoder[String].contramap(_.value)
   given JsonCodec[Character]     = DeriveJsonCodec.gen
+  given JsonCodec[RoleReq]          = DeriveJsonCodec.gen
+  given JsonCodec[AddCharacterArgs] = DeriveJsonCodec.gen
+
   given JsonCodec[RestInternalServerError] = DeriveJsonCodec.gen
   given JsonCodec[RestNotFoundError] = DeriveJsonCodec.gen
 
@@ -29,6 +33,9 @@ object TapirSupport extends Tapir
   given Schema[Role]        = Schema.derived
   given Schema[CharacterId] = Schema.string
   given Schema[Character]   = Schema.derived
+  given Schema[RoleReq]     = Schema.derived
+  given Schema[AddCharacterArgs] = Schema.derived
+
   given Schema[RestInternalServerError] = Schema.derived
   given Schema[RestNotFoundError]       = Schema.derived
 
@@ -37,6 +44,9 @@ object TapirSupport extends Tapir
 
   val characterIdQuery: EndpointInput.Query[CharacterId] =
     query[CharacterId]("id")
+
+  final case class AddCharacterArgs(
+    name: String, nicknames: List[String], origin: Origin, role: Option[RoleReq])
 
 }
 
