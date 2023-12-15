@@ -1,50 +1,44 @@
 package com.example.application.models
 
+import enumeratum._
+
 object CharactersData {
 
   final case class CharacterId(value: String) extends AnyVal
-
   final case class Character(characterId: CharacterId, name: String, nicknames: List[String], origin: Origin, role: Option[Role])
 
-  sealed trait Origin
-  object Origin {
+  sealed trait Origin extends EnumEntry
+  object Origin extends Enum[Origin] {
     case object EARTH extends Origin
     case object MARS  extends Origin
     case object BELT  extends Origin
 
-    def fromString(s: String): Origin = s match {
-      case "EARTH" => EARTH
-      case "MARS"  => MARS
-      case "BELT"  => BELT
-    }
+    val values = findValues
   }
 
-  sealed trait Role
+  sealed trait Role {
+    def shipName: String
+    def roleName: String
+  }
   object Role {
-    case class Captain(shipName: String)  extends Role
-    case class Pilot(shipName: String)    extends Role
-    case class Engineer(shipName: String) extends Role
-    case class Mechanic(shipName: String) extends Role
-
-    def fromString(s: String, n: String): Role = s match {
-      case "Captain"  => Captain(n)
-      case "Pilot"    => Pilot(n)
-      case "Engineer" => Engineer(n)
-      case "Mechanic" => Mechanic(n)
+    case class Captain(shipName: String)  extends Role {
+      override def roleName: String = "Captain"
+    }
+    case class Pilot(shipName: String)    extends Role {
+      override def roleName: String = "Pilot"
+    }
+    case class Engineer(shipName: String) extends Role {
+      override def roleName: String = "Engineer"
+    }
+    case class Mechanic(shipName: String) extends Role {
+      override def roleName: String = "Mechanic"
     }
 
-    def getString(r: Role): String = r match {
-      case _:Captain  => "Captain"
-      case _:Pilot    => "Pilot"
-      case _:Engineer => "Engineer"
-      case _:Mechanic => "Mechanic"
-    }
-
-    def getShipName(r: Role): String = r match {
-      case Captain(shipName)  => shipName
-      case Pilot(shipName)    => shipName
-      case Engineer(shipName) => shipName
-      case Mechanic(shipName) => shipName
+    def fromString(s: String, n: String): Role = s.toLowerCase match {
+      case "captain"  => Captain(n)
+      case "pilot"    => Pilot(n)
+      case "engineer" => Engineer(n)
+      case "mechanic" => Mechanic(n)
     }
 
   }

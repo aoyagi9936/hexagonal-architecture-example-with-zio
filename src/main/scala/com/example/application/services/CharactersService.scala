@@ -10,6 +10,8 @@ import zio._
 trait CharactersService {
   def getCharacters(origin: Option[Origin]): IO[DomainError, List[Character]]
   def findCharacter(id: CharacterId): IO[DomainError, Character]
+  def addCharacter(data: Character): IO[DomainError, CharacterId]
+  def updateCharacter(data: Character): IO[DomainError, Boolean]
   def deleteCharacter(id: CharacterId): IO[DomainError, Boolean]
   def deletedEvents: ZStream[Any, Nothing, String]
 }
@@ -32,11 +34,37 @@ object CharactersService {
         failure => ZIO.fail(CharactersServiceError()),
         success => success match {
           case Some(v) => ZIO.succeed(v)
-          case None    => ZIO.fail(CharacterNotFoundError())
+          case None    => ZIO.fail(DataNotFoundError())
         }
       )
 
-    override def deleteCharacter(id: CharacterId): IO[DomainError, Boolean] = ???
+    override def addCharacter(data: Character): IO[DomainError, CharacterId] =
+      charRepo.add(data).foldZIO(
+        failure => failure match {
+          case _: DuplicateDataError => ZIO.fail(DataConflictError())
+          case _                     => ZIO.fail(CharactersServiceError())
+        },
+        success => ZIO.succeed(success),
+      )
+
+    override def updateCharacter(data: Character): IO[DomainError, Boolean] =
+      charRepo.update(data.characterId, data).foldZIO(
+        failure => ZIO.fail(CharactersServiceError()),
+        success => success match {
+          case Some(v) => ZIO.succeed(true)
+          case None    => ZIO.fail(DataNotFoundError())
+        }
+      )
+
+    override def deleteCharacter(id: CharacterId): IO[DomainError, Boolean] =
+      charRepo.delete(id).foldZIO(
+        failure => ZIO.fail(CharactersServiceError()),
+        success => success match {
+          case 1L => ZIO.succeed(true)
+          case 0L => ZIO.fail(DataNotFoundError())
+        }
+      )
+
     override def deletedEvents: ZStream[Any, Nothing, String] = ???
   }
 

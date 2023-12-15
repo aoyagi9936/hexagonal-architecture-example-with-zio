@@ -23,28 +23,39 @@ object CharactersSchema {
 
   case class Queries(
     @GQLDescription("Return all characters from a given origin")
-    characters: CharactersArgs => ZIO[Apis, PrimaryError, List[Character]],
+    characters: GetCharactersArgs => ZIO[Apis, PrimaryError, List[Character]],
     @GQLDeprecated("Use `characters`")
-    character: CharacterArgs   => ZIO[Apis, PrimaryError, Character]
+    character: GetCharacterArgs   => ZIO[Apis, PrimaryError, Character],
   )
-  case class Mutations(deleteCharacter: CharacterArgs => ZIO[Apis, PrimaryError, Boolean])
+  case class Mutations(
+    addCharacter: AddCharacterArgs    => ZIO[Apis, PrimaryError, CharacterId],
+    updateCharacter: UpdCharacterArgs => ZIO[Apis, PrimaryError, Boolean],
+    deleteCharacter: DelCharacterArgs => ZIO[Apis, PrimaryError, Boolean],
+  )
   case class Subscriptions(characterDeleted: ZStream[Apis, Nothing, String])
 
   // Enum/Union
-  given Schema[Any, Origin]         = Schema.Auto.derived
-  given Schema[Any, Role]           = Schema.Auto.derived
+  given Schema[Any, Origin] = Schema.Auto.derived
+  given Schema[Any, Role]   = Schema.Auto.derived
 
   // Request
-  given Schema[Any, CharacterArgs]  = Schema.gen
+  given Schema[Any, RoleArg]          = Schema.gen
+  given Schema[Any, GetCharacterArgs] = Schema.gen
   given ArgBuilder[CharacterId] = {
     case Value.StringValue(value) =>
       Try(CharacterId(value))
         .fold(ex => Left(ExecutionError(s"Can't parse $value into a CharacterId", innerThrowable = Some(ex))), Right(_))
     case other => Left(ExecutionError(s"Can't build a CharacterId from input $other"))
   }
-  given ArgBuilder[CharacterArgs]   = ArgBuilder.derived
-  given Schema[Any, CharactersArgs] = Schema.gen
-  given ArgBuilder[CharactersArgs]  = ArgBuilder.Auto.derived
+  given ArgBuilder[GetCharacterArgs]   = ArgBuilder.derived
+  given Schema[Any, GetCharactersArgs] = Schema.gen
+  given ArgBuilder[GetCharactersArgs]  = ArgBuilder.Auto.derived
+  given Schema[Any, AddCharacterArgs]  = Schema.gen
+  given ArgBuilder[AddCharacterArgs]   = ArgBuilder.Auto.derived
+  given Schema[Any, UpdCharacterArgs]  = Schema.gen
+  given ArgBuilder[UpdCharacterArgs]   = ArgBuilder.Auto.derived
+  given Schema[Any, DelCharacterArgs]  = Schema.gen
+  given ArgBuilder[DelCharacterArgs]   = ArgBuilder.derived
 
   // Response
   given Schema[Any, CharacterId]    = Schema.stringSchema.contramap(_.value)
@@ -60,9 +71,13 @@ object CharactersSchema {
       RootResolver(
         Queries(
           args => CharactersApi.getCharacters(args.origin),
-          args => CharactersApi.findCharacter(args.id)
+          args => CharactersApi.findCharacter(args.id),
         ),
-        Mutations(args => CharactersApi.deleteCharacter(args.id)),
+        Mutations(
+          args => CharactersApi.addCharacter(args.name, args.nicknames, args.origin, args.role),
+          args => CharactersApi.updateCharacter(args.id, args.name, args.nicknames, args.origin, args.role),
+          args => CharactersApi.deleteCharacter(args.id),
+        ),
         Subscriptions(CharactersApi.deletedEvents)
       )
     )

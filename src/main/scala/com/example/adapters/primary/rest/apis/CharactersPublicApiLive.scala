@@ -25,8 +25,8 @@ object CharactersPublicApiLive {
         svc.findCharacter(id)
           .foldZIO(
             error => error match {
-              case _:CharacterNotFoundError => ZIO.fail(RestNotFoundError())
-              case _:CharactersServiceError => ZIO.fail(RestInternalServerError())
+              case _:DataNotFoundError => ZIO.fail(RestNotFoundError())
+              case _                   => ZIO.fail(RestInternalServerError())
             },
             success => ZIO.succeed(success)
           )
