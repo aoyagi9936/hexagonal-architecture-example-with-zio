@@ -1,26 +1,32 @@
 package com.example.application.constants
 
 // Primary Layer
-sealed trait PrimaryError(errorCode: String, message: String) extends Throwable {
-  def code = errorCode
+sealed trait PrimaryError(errorCode: String, errorMessage: String) extends Throwable {
+  def code    = errorCode
+  def message = errorMessage
 }
+final case class ErrorJson(errorCode: String, errorMessage: String)
+//400 Bad Request Error
+case object RoleBadRequestError extends PrimaryError(
+  "INVARID_ROLE_ERROR",
+  "Invalid role requested. Please check available roles.")
 //401 Unauthorized
-case object UnAuthorizedError extends PrimaryError("UNAUTHORIZED_ERROR", "You are not authenticated. You need to create an account or accept an invitation.")
+case object UnAuthorizedError extends PrimaryError(
+  "UNAUTHORIZED_ERROR",
+  "You are not authenticated. You need to create an account or accept an invitation.")
 //403 Forbidden
-case object ForbiddenError extends PrimaryError("FORBIDDEN_ERROR", "Permission denied for this resource. Add the roles you need to access the resource.")
+case object ForbiddenError extends PrimaryError(
+  "FORBIDDEN_ERROR",
+  "Permission denied for this resource. Add the roles you need to access the resource.")
 //404 NotFound
-case object NotFoundError extends PrimaryError("NOTFOUND_ERROR", "Data is not found.")
+case object NotFoundError extends PrimaryError(
+  "NOTFOUND_ERROR",
+  "Data is not found.")
 //500 Internal Server Error
-case object InternalServerError extends PrimaryError("INTERNAL_SERVER_ERROR", "An Internal Server Error has occurred. Please contact support.")
+case object InternalServerError extends PrimaryError(
+  "INTERNAL_SERVER_ERROR",
+  "An Internal Server Error has occurred. Please contact support.")
 
-case class RestNotFoundError(
-  errorCode: String = "NOTFOUND_ERROR",
-  message: String   = "Data is not found."
-) extends PrimaryError(errorCode, message)
-case class RestInternalServerError(
-  errorCode: String = "INTERNAL_SERVER_ERROR",
-  message: String   = "An Internal Server Error has occurred. Please contact support."
-) extends PrimaryError(errorCode, message)
 
 // Application Layer
 sealed trait DomainError(message: String)

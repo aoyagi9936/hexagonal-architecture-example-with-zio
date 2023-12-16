@@ -23,12 +23,16 @@ object CharactersPublicEndpoint {
       .errorOut(
         oneOf[PrimaryError](
           oneOfVariant(
+            statusCode(StatusCode.BadRequest)
+              .and(jsonBody[RoleBadRequestError.type])
+          ),
+          oneOfVariant(
             statusCode(StatusCode.NotFound)
-              .and(jsonBody[RestNotFoundError])
+              .and(jsonBody[NotFoundError.type])
           ),
           oneOfVariant(
             statusCode(StatusCode.InternalServerError)
-              .and(jsonBody[RestInternalServerError])
+              .and(jsonBody[InternalServerError.type])
           )
         )
       )

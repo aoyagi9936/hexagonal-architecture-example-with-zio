@@ -31,7 +31,7 @@ object CharactersApiLive {
         for {
           id <- idGen.typeid("char")
           .mapError(_ => InternalServerError)
-          c  <- ZIO.succeed(
+          c  <- ZIO.attempt(
             Character(
               CharacterId(id.value),
               name,
@@ -39,7 +39,9 @@ object CharactersApiLive {
               origin,
               role.map(v => Role.fromString(v.kind, v.shipName))
             )
-          )
+          ).catchAll {
+            case e: MatchError => ZIO.fail(RoleBadRequestError)
+          }
           r <- svc.addCharacter(c)
           .mapError(_ => InternalServerError)
         } yield r

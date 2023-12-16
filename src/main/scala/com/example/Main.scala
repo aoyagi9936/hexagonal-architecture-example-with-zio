@@ -69,7 +69,10 @@ object Main extends ZIOAppDefault {
     interpreter: GraphQLInterpreter[R, CalibanError]
   ): GraphQLInterpreter[R, CalibanError] = interpreter.mapError {
     case err @ ExecutionError(_, _, _, Some(primaryError: PrimaryError), _) =>
-      err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue(primaryError.code))))))
+      err.copy(extensions = Some(ObjectValue(List(
+        ("errorCode", StringValue(primaryError.code)),
+        ("errorMessage", StringValue(primaryError.message)),
+      ))))
     case err: ExecutionError =>
       err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("EXECUTION_ERROR"))))))
     case err: ValidationError =>
