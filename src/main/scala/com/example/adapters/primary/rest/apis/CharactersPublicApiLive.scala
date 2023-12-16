@@ -20,15 +20,15 @@ object CharactersPublicApiLive {
       def getCharacters(origin: Option[Origin]): IO[PrimaryError, List[Character]] =
         svc.getCharacters(origin)
           .foldZIO(
-            error   => ZIO.fail(RestInternalServerError()),
+            error   => ZIO.fail(InternalServerError),
             success => ZIO.succeed(success)
           )
       def findCharacter(id: CharacterId): IO[PrimaryError, Character] =
         svc.findCharacter(id)
           .foldZIO(
             error => error match {
-              case _:DataNotFoundError => ZIO.fail(RestNotFoundError())
-              case _                   => ZIO.fail(RestInternalServerError())
+              case _:DataNotFoundError => ZIO.fail(NotFoundError)
+              case _                   => ZIO.fail(InternalServerError)
             },
             success => ZIO.succeed(success)
           )
@@ -36,7 +36,7 @@ object CharactersPublicApiLive {
         for {
           id <- idGen.typeid("pubchar")
           .mapError(_ => InternalServerError)
-          c  <- ZIO.succeed(
+          c  <- ZIO.attempt(
             Character(
               CharacterId(id.value),
               name,
@@ -44,7 +44,9 @@ object CharactersPublicApiLive {
               origin,
               role.map(v => Role.fromString(v.kind, v.shipName))
             )
-          )
+          ).catchAll {
+            case e: MatchError => ZIO.fail(RoleBadRequestError)
+          }
           r <- svc.addCharacter(c)
           .mapError(_ => InternalServerError)
         } yield r

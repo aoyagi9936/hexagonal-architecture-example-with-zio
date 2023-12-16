@@ -26,8 +26,17 @@ object TapirSupport extends Tapir
   given JsonCodec[RoleReq]          = DeriveJsonCodec.gen
   given JsonCodec[AddCharacterArgs] = DeriveJsonCodec.gen
 
-  given JsonCodec[RestInternalServerError] = DeriveJsonCodec.gen
-  given JsonCodec[RestNotFoundError] = DeriveJsonCodec.gen
+  given JsonEncoder[ErrorJson]                = JsonEncoder.derived
+  given JsonDecoder[ForbiddenError.type]      = JsonDecoder.derived
+  given JsonEncoder[ForbiddenError.type]      = JsonEncoder[ErrorJson].contramap(e => ErrorJson(e.code, e.message))
+  given JsonDecoder[UnAuthorizedError.type]   = JsonDecoder.derived
+  given JsonEncoder[UnAuthorizedError.type]   = JsonEncoder[ErrorJson].contramap(e => ErrorJson(e.code, e.message))
+  given JsonDecoder[RoleBadRequestError.type] = JsonDecoder.derived
+  given JsonEncoder[RoleBadRequestError.type] = JsonEncoder[ErrorJson].contramap(e => ErrorJson(e.code, e.message))
+  given JsonDecoder[NotFoundError.type]       = JsonDecoder.derived
+  given JsonEncoder[NotFoundError.type]       = JsonEncoder[ErrorJson].contramap(e => ErrorJson(e.code, e.message))
+  given JsonDecoder[InternalServerError.type] = JsonDecoder.derived
+  given JsonEncoder[InternalServerError.type] = JsonEncoder[ErrorJson].contramap(e => ErrorJson(e.code, e.message))
 
   given Schema[Origin]      = Schema.derivedEnumeration.defaultStringBased
   given Schema[Role]        = Schema.derived
@@ -36,8 +45,11 @@ object TapirSupport extends Tapir
   given Schema[RoleReq]     = Schema.derived
   given Schema[AddCharacterArgs] = Schema.derived
 
-  given Schema[RestInternalServerError] = Schema.derived
-  given Schema[RestNotFoundError]       = Schema.derived
+  given Schema[ForbiddenError.type]      = Schema.derived
+  given Schema[UnAuthorizedError.type]   = Schema.derived
+  given Schema[RoleBadRequestError.type] = Schema.derived
+  given Schema[NotFoundError.type]       = Schema.derived
+  given Schema[InternalServerError.type] = Schema.derived
 
   val originMaybeQuery: EndpointInput.Query[Option[Origin]] =
     query[Option[Origin]]("origin")

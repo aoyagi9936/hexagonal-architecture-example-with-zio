@@ -40,7 +40,7 @@ object CharactersData {
       case "pilot"    => Pilot(shipName)
       case "engineer" => Engineer(shipName)
       case "mechanic" => Mechanic(shipName)
-    }
+     }
 
   }
 
