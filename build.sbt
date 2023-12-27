@@ -1,14 +1,15 @@
-val calibanVersion        = "2.4.3"
-val tapirVersion          = "1.8.2"
-val zioVersion            = "2.0.18"
+val calibanVersion        = "2.5.0"
+val tapirVersion          = "1.9.6"
+val zioVersion            = "2.0.20"
 val zioConfigVersion      = "4.0.0-RC16"
-val zioLoggingVersion     = "2.1.14"
+val zioLoggingVersion     = "2.1.16"
 val zioUuidVersion        = "1.0.0"
-val logbackClassicVersion = "1.4.4"
+val logbackClassicVersion = "1.4.14"
 val postgresqlVersion     = "42.5.0"
 val enumeratumVersion     = "1.7.3"
 val quillVersion          = "4.8.0"
 val testContainersVersion = "0.41.0"
+val http4sVersion         = "0.23.24"
 
 lazy val root = (project in file("."))
   .settings(
@@ -26,7 +27,7 @@ lazy val root = (project in file("."))
       "com.softwaremill.sttp.tapir" %% "tapir-json-zio"          % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
 
-      "org.http4s"                  %% "http4s-ember-server"     % "0.23.23",
+      "org.http4s"                  %% "http4s-ember-server"     % http4sVersion,
       "io.getquill"                 %% "quill-jdbc-zio"          % quillVersion excludeAll (
         ExclusionRule(organization = "org.scala-lang.modules"),
         ExclusionRule(organization = "org.scalameta"),
