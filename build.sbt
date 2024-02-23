@@ -1,14 +1,14 @@
-val calibanVersion        = "2.5.1"
-val tapirVersion          = "1.9.7"
+val calibanVersion        = "2.5.2"
+val tapirVersion          = "1.9.10"
 val zioVersion            = "2.0.21"
 val zioConfigVersion      = "4.0.1"
-val zioLoggingVersion     = "2.2.0"
+val zioLoggingVersion     = "2.2.2"
 val zioUuidVersion        = "1.0.0"
-val logbackClassicVersion = "1.4.14"
-val postgresqlVersion     = "42.5.0"
+val logbackClassicVersion = "1.5.0"
+val postgresqlVersion     = "42.7.2"
 val enumeratumVersion     = "1.7.3"
 val quillVersion          = "4.8.1"
-val testContainersVersion = "0.41.0"
+val testContainersVersion = "0.41.3"
 val http4sVersion         = "0.23.25"
 
 lazy val root = (project in file("."))
@@ -16,7 +16,7 @@ lazy val root = (project in file("."))
     inThisBuild(
       List(
         organization := "com.example",
-        scalaVersion := "3.3.1",
+        scalaVersion := "3.4.0",
         run / fork := true,
         run / connectInput := true,
       )
