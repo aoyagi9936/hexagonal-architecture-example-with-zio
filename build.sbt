@@ -1,15 +1,15 @@
-val calibanVersion        = "2.5.2"
-val tapirVersion          = "1.9.10"
+val calibanVersion        = "2.5.3"
+val tapirVersion          = "1.9.11"
 val zioVersion            = "2.0.21"
 val zioConfigVersion      = "4.0.1"
 val zioLoggingVersion     = "2.2.2"
 val zioUuidVersion        = "1.0.0"
-val logbackClassicVersion = "1.5.0"
+val logbackClassicVersion = "1.5.3"
 val postgresqlVersion     = "42.7.2"
 val enumeratumVersion     = "1.7.3"
 val quillVersion          = "4.8.1"
 val testContainersVersion = "0.41.3"
-val http4sVersion         = "0.23.25"
+val http4sVersion         = "0.23.26"
 
 lazy val root = (project in file("."))
   .settings(
